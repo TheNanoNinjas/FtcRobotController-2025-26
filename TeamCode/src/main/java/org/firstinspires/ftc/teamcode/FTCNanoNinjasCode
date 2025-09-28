@@ -1,0 +1,163 @@
+//2025-26 code for 25756 Nano Ninjas
+
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+//import com.qualcomm.robotcore.hardware.DistanceSensor;
+
+//import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+
+
+@TeleOp(name = "Main_Controller")
+public class FTCNanoNinjasCode extends LinearOpMode {
+
+    private DcMotor intakeMotor;
+    private DcMotor leftShooter;
+    private DcMotor rightShooter;
+    private DcMotor fl_motor;
+    private DcMotor fr_motor;
+    private DcMotor bl_motor;
+    private DcMotor br_motor;
+    private CRServo rampServo;
+
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        initializeHardware();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            moveRobot();
+            shootArtifacts();
+            shootArtifactsTrigger();
+            intakeArtifacts();
+            moveArtifacts();
+
+        }
+    }
+
+
+
+    private void moveRobot() {
+        double drive = -gamepad1.left_stick_y;
+        double strafe = -gamepad1.left_stick_x;
+        double turn = -gamepad1.right_stick_x;
+
+        double powerScale = 0.40;
+
+        double leftFrontPower = (drive + strafe + turn) * powerScale;
+        double rightFrontPower = (drive - strafe - turn) * powerScale;
+        double leftRearPower = (drive - strafe + turn) * powerScale;
+        double rightRearPower = (drive + strafe - turn) * powerScale;
+
+
+
+
+        double maxPower = Math.max(Math.abs(leftFrontPower),
+                Math.max(Math.abs(rightFrontPower),
+                        Math.max(Math.abs(leftRearPower), Math.abs(rightRearPower))));
+        if (maxPower > 1 ) {
+            leftFrontPower /= maxPower;
+            rightFrontPower /= maxPower;
+            leftRearPower /= maxPower;
+            rightRearPower /= maxPower;
+        }
+
+
+        fl_motor.setPower(leftFrontPower);
+        fr_motor.setPower(rightFrontPower);
+        bl_motor.setPower(-leftRearPower);
+        br_motor.setPower(-rightRearPower);
+    }
+
+    private void initializeHardware() {
+        leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
+        rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
+
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+
+        rampServo = hardwareMap.get(CRServo.class, "rampServo");
+
+
+
+        fl_motor = hardwareMap.get(DcMotor.class, "fl_motor");
+        fr_motor = hardwareMap.get(DcMotor.class, "fr_motor");
+        bl_motor = hardwareMap.get(DcMotor.class, "bl_motor");
+        br_motor = hardwareMap.get(DcMotor.class, "br_motor");
+
+        if (leftShooter != null) {
+            telemetry.addData("Shoot Motor 1 Initialized on Port :  ", leftShooter.getPortNumber());
+        }
+        if (rightShooter != null) {
+            telemetry.addData("Shoot Motor 2 Initialized on port : ", rightShooter.getPortNumber());
+            rightShooter.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if (intakeMotor != null) {
+            telemetry.addData("Intake Motor Initialized on port : ", intakeMotor.getPortNumber());
+        }
+        if (rampServo != null) {
+            telemetry.addData("Ramp Servo Initialized on Port :  ", rampServo.getPortNumber());
+        }
+
+        if (fl_motor != null) {
+            telemetry.addData("Front Left motor ", "Initialized");
+        }
+        if (fr_motor != null) {
+            telemetry.addData("Front Right motor ", "Initialized");
+        }
+        if (bl_motor != null) {
+            telemetry.addData("Back Left motor ", "Initialized");
+        }
+        if (br_motor != null) {
+            telemetry.addData("Back Right motor ", "Initialized");
+        }
+
+        fr_motor.setDirection(DcMotor.Direction.REVERSE);
+        br_motor.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry.addData("Hardware", "Initialized");
+        telemetry.update();
+    }
+
+
+
+    private void shootArtifacts() {
+        if (gamepad2.right_bumper) {
+            leftShooter.setPower(1.0);
+            rightShooter.setPower(1.0);
+        } else {
+            leftShooter.setPower(0.0);
+            rightShooter.setPower(0.0);
+        }
+    }
+
+    private void shootArtifactsTrigger() {
+        float factor = 1;
+        float shooting = gamepad2.right_trigger * factor;
+
+        leftShooter.setPower(shooting);
+        rightShooter.setPower(shooting);
+    }
+
+    private void intakeArtifacts() {
+        if (gamepad2.left_bumper) {
+            intakeMotor.setPower(0.75);
+        } else {
+            intakeMotor.setPower(0.0);
+        }
+    }
+
+    private void moveArtifacts() {
+        if (gamepad2.triangle) {
+            rampServo.setPower(1.0);
+        }
+        else {
+            rampServo.setPower(0.0);
+        }
+    }
+}
