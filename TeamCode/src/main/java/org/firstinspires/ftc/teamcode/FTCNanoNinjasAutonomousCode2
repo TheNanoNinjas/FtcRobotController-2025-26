@@ -1,0 +1,134 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+@Autonomous(name="AviAuto", group="Linear Opmode")
+public class FTCNanoNinjasAutonomousCode2 extends LinearOpMode {
+
+    private DcMotor fr_motor, fl_motor, br_motor, bl_motor;
+    private DcMotor rightShooter, leftShooter;
+
+
+
+    @Override
+    public void runOpMode() {
+
+        // telling the control hub what to look for
+        fr_motor = hardwareMap.get(DcMotor.class, "fr_motor");
+        fl_motor = hardwareMap.get(DcMotor.class, "fl_motor");
+        br_motor = hardwareMap.get(DcMotor.class, "br_motor");
+        bl_motor = hardwareMap.get(DcMotor.class, "bl_motor");
+        leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
+        rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
+
+
+
+        // Reverse left side motors
+        fl_motor.setDirection(DcMotor.Direction.REVERSE);
+        bl_motor.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry.addLine("Ready to run. Waiting for start...");
+        telemetry.update();
+
+        waitForStart();
+
+        if (opModeIsActive()) {
+            // Drive forward based on power and time allotment
+            driveForward(0.2, 2500);
+            turnLeft(0.2, 1000);
+            sleep(1000);
+            shootMotors();
+            sleep(2000);
+            stopShootMotors();
+            sleep (1000);
+            turnRight(0.2, 2500);
+            sleep(1000);
+            driveBackword(0.2, 2500);
+            sleep(1000);
+            turnRight(0.2, 5000);
+            sleep(1000);
+            driveForward(0.3, 4000);
+            sleep(2500);
+            driveBackword(0.3,4000);
+            sleep(1000);
+            turnLeft(0.3, 4000);
+            sleep(1000);
+            driveForward(0.2, 5000);
+            sleep(1000);
+            turnLeft(0.2,2500);
+            sleep(1000);
+            shootMotors();
+            sleep(2000);
+            stopShootMotors();
+
+
+
+
+
+
+
+
+        }
+    }
+
+    private void driveForward(double power, long timeMs) {
+        fr_motor.setPower(power);
+        fl_motor.setPower(power);
+        br_motor.setPower(power);
+        bl_motor.setPower(power);
+
+        sleep(timeMs);
+        stopMotors();
+    }
+
+    private void driveBackword(double power, long timeMs) {
+        fr_motor.setPower(power);
+        fl_motor.setPower(power);
+        br_motor.setPower(power);
+        bl_motor.setPower(power);
+
+        sleep(timeMs);
+        stopMotors();
+    }
+
+    private void turnRight(double power, long timeMs) {
+        fr_motor.setPower(-power);
+        br_motor.setPower(-power);
+        fl_motor.setPower(power);
+        bl_motor.setPower(power);
+
+        sleep(timeMs);
+        stopMotors();
+    }
+
+    private void turnLeft(double power, long timeMs) {
+        fr_motor.setPower(power);
+        br_motor.setPower(power);
+        fl_motor.setPower(-power);
+        bl_motor.setPower(-power);
+
+        sleep(timeMs);
+        stopMotors();
+    }
+
+
+    private void stopMotors() {
+        fr_motor.setPower(0);
+        fl_motor.setPower(0);
+        br_motor.setPower(0);
+        bl_motor.setPower(0);
+    }
+    private void shootMotors() {
+        leftShooter.setPower(1.0);
+        rightShooter.setPower(1.0);
+    }
+
+    private void stopShootMotors() {
+        leftShooter.setPower(0.0);
+        rightShooter.setPower(0.0);
+    }
+}
