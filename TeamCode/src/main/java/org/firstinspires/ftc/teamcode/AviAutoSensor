@@ -1,0 +1,113 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+@Autonomous(name="AviAutoTest", group="Linear Opmode")
+public class AutoTest extends LinearOpMode {
+
+    private DcMotor fr_motor, fl_motor, br_motor, bl_motor;
+    private DcMotor rightShooter, leftShooter, intakeMotor;
+    private CRServo rampServo;
+    private Rev2mDistanceSensor sensorTimeOfFlight;
+
+    @Override
+    public void runOpMode() {
+
+        // ---------- Hardware Mapping ----------
+        fr_motor = hardwareMap.get(DcMotor.class, "fr_motor");
+        fl_motor = hardwareMap.get(DcMotor.class, "fl_motor");
+        br_motor = hardwareMap.get(DcMotor.class, "br_motor");
+        bl_motor = hardwareMap.get(DcMotor.class, "bl_motor");
+        leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
+        rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        rampServo = hardwareMap.get(CRServo.class, "rampServo");
+
+        // ---------- Distance Sensor ----------
+        sensorTimeOfFlight = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+
+        // ---------- Motor Directions ----------
+        //
+        fr_motor.setDirection(DcMotor.Direction.REVERSE);
+        br_motor.setDirection(DcMotor.Direction.REVERSE);
+        fl_motor.setDirection(DcMotor.Direction.FORWARD);
+        bl_motor.setDirection(DcMotor.Direction.FORWARD);
+
+        rightShooter.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry.addLine("Click Start to begin Auto");
+        telemetry.update();
+
+        waitForStart();
+
+        if (opModeIsActive()) {
+
+            // ---------- Drive Forward Until 20 Inches Away ----------
+            while (opModeIsActive() &&
+                    sensorTimeOfFlight.getDistance(DistanceUnit.INCH) > 20.0) {
+
+                driveForward(0.3);
+
+                double distINCH = sensorTimeOfFlight.getDistance(DistanceUnit.INCH);
+                telemetry.addData("Distance (in)", "%.2f", distINCH);
+                telemetry.update();
+            }
+
+            // ---------- Stop When Target Distance is Reached ----------
+            stopMotors();
+            telemetry.addLine("Target Distance Reached (20 in)");
+            telemetry.update();
+
+            // ---------- Continue Doing Other Stuff ----------
+            sleep(500); // short pause
+
+            // Example: Move backward for 1 second
+           shootArtifacts(1.0,2000);
+
+            rampServo.setPower(1.0);
+            sleep(5000);
+            rampServo.setPower(0.0);
+
+            shootArtifacts(1.0,2000);
+
+            stopMotors();
+
+
+        }
+    }
+
+    // ---------- Helper Methods ----------
+    private void driveForward(double power) {
+        fr_motor.setPower(power);
+        fl_motor.setPower(power);
+        br_motor.setPower(power);
+        bl_motor.setPower(power);
+    }
+
+    private void driveBackward(double power) {
+        fr_motor.setPower(-power);
+        fl_motor.setPower(-power);
+        br_motor.setPower(-power);
+        bl_motor.setPower(-power);
+    }
+
+    private void shootArtifacts(double power, long timeMS){
+        leftShooter.setPower(power);
+        rightShooter.setPower(-power);
+        sleep(timeMS);
+        leftShooter.setPower(0.0);
+        rightShooter.setPower(0.0);
+    }
+
+
+
+
+    private void stopMotors() {
+        driveForward(0);
+    }
+}
