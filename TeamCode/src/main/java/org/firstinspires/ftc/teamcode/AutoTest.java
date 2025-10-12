@@ -67,7 +67,7 @@ public class AutoTest extends LinearOpMode {
             sleep(500); // short pause
 
             // Example: Move backward for 1 second
-           shootArtifacts(1.0,2000);
+            shootArtifacts(1.0,2000);
 
             rampServo.setPower(1.0);
             sleep(5000);
