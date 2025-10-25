@@ -6,22 +6,24 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 //import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 //import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
 
-@TeleOp(name = "Main_Controller")
+@TeleOp(name = "NanoNinjasMainCode")
 public class FTCNanoNinjasCode extends LinearOpMode {
 
-    private DcMotor intakeMotor;
+    private DcMotor pushMotor;
     private DcMotor leftShooter;
     private DcMotor rightShooter;
     private DcMotor fl_motor;
     private DcMotor fr_motor;
     private DcMotor bl_motor;
     private DcMotor br_motor;
-    private CRServo rampServo;
+    //private CRServo rampServo;
+    private Servo gateServo;
 
 
     @Override
@@ -34,9 +36,9 @@ public class FTCNanoNinjasCode extends LinearOpMode {
         while (opModeIsActive()) {
             moveRobot();
             shootArtifacts();
-            shootArtifactsTrigger();
-            intakeArtifacts();
-            moveArtifacts();
+            //shootArtifactsTrigger();
+            pushArtifacts();
+            gateArtifacts();
 
         }
     }
@@ -79,9 +81,9 @@ public class FTCNanoNinjasCode extends LinearOpMode {
         leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
         rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
 
-        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        pushMotor = hardwareMap.get(DcMotor.class, "pushMotor");
 
-        rampServo = hardwareMap.get(CRServo.class, "rampServo");
+        //rampServo = hardwareMap.get(CRServo.class, "rampServo");
 
 
 
@@ -89,6 +91,7 @@ public class FTCNanoNinjasCode extends LinearOpMode {
         fr_motor = hardwareMap.get(DcMotor.class, "fr_motor");
         bl_motor = hardwareMap.get(DcMotor.class, "bl_motor");
         br_motor = hardwareMap.get(DcMotor.class, "br_motor");
+        gateServo = hardwareMap.get(Servo.class, "gateServo");
 
         if (leftShooter != null) {
             telemetry.addData("Shoot Motor 1 Initialized on Port :  ", leftShooter.getPortNumber());
@@ -97,11 +100,11 @@ public class FTCNanoNinjasCode extends LinearOpMode {
             telemetry.addData("Shoot Motor 2 Initialized on port : ", rightShooter.getPortNumber());
             rightShooter.setDirection(DcMotor.Direction.REVERSE);
         }
-        if (intakeMotor != null) {
-            telemetry.addData("Intake Motor Initialized on port : ", intakeMotor.getPortNumber());
+        if (pushMotor != null) {
+            telemetry.addData("Intake Motor Initialized on port : ", pushMotor.getPortNumber());
         }
-        if (rampServo != null) {
-            telemetry.addData("Ramp Servo Initialized on Port :  ", rampServo.getPortNumber());
+        if (gateServo != null) {
+            telemetry.addData("Gate Servo Initialized on Port :  ", gateServo.getPortNumber());
         }
 
         if (fl_motor != null) {
@@ -117,11 +120,21 @@ public class FTCNanoNinjasCode extends LinearOpMode {
             telemetry.addData("Back Right motor ", "Initialized");
         }
 
+
+
+
+
         fr_motor.setDirection(DcMotor.Direction.REVERSE);
         br_motor.setDirection(DcMotor.Direction.REVERSE);
 
+
+        
+
         telemetry.addData("Hardware", "Initialized");
         telemetry.update();
+
+
+
     }
 
 
@@ -136,28 +149,35 @@ public class FTCNanoNinjasCode extends LinearOpMode {
         }
     }
 
-    private void shootArtifactsTrigger() {
-        float factor = 1;
-        float shooting = gamepad2.right_trigger * factor;
+    //private void shootArtifactsTrigger() {
+       // float factor = 1;
+       // float shooting = gamepad2.right_trigger * factor;
 
-        leftShooter.setPower(shooting);
-        rightShooter.setPower(shooting);
-    }
+        //leftShooter.setPower(shooting);
+        //rightShooter.setPower(shooting);
+    //}
 
-    private void intakeArtifacts() {
+    private void pushArtifacts() {
         if (gamepad2.left_bumper) {
-            intakeMotor.setPower(0.75);
+            pushMotor.setPower(1.0);
         } else {
-            intakeMotor.setPower(0.0);
+            pushMotor.setPower(0.0);
         }
     }
 
-    private void moveArtifacts() {
+    private void gateArtifacts() {
         if (gamepad2.triangle) {
-            rampServo.setPower(1.0);
+            gateServo.setPosition(0.5);
+            telemetry.addData("Gate Servo Position-", gateServo.getPosition());
+            telemetry.update();
         }
         else {
-            rampServo.setPower(0.0);
+         
+            gateServo.setPosition(-1.0);
+            telemetry.addData("Gate Servo Position-", gateServo.getPosition());
+            telemetry.update();
         }
     }
+
+
 }
