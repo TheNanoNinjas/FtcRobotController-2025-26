@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 //import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 
 
-@TeleOp(name = "Main_Controller")
+@TeleOp(name = "NanoNinjasMainCode")
 public class FTCNanoNinjasCode extends LinearOpMode {
 
     private DcMotor intakeMotor;
