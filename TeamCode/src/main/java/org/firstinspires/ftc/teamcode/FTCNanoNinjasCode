@@ -73,8 +73,8 @@ public class FTCNanoNinjasCode extends LinearOpMode {
 
         fl_motor.setPower(leftFrontPower);
         fr_motor.setPower(rightFrontPower);
-        bl_motor.setPower(-leftRearPower);
-        br_motor.setPower(-rightRearPower);
+        bl_motor.setPower(leftRearPower);
+        br_motor.setPower(rightRearPower);
     }
 
     private void initializeHardware() {
@@ -125,7 +125,7 @@ public class FTCNanoNinjasCode extends LinearOpMode {
 
 
         fr_motor.setDirection(DcMotor.Direction.REVERSE);
-        br_motor.setDirection(DcMotor.Direction.REVERSE);
+        bl_motor.setDirection(DcMotor.Direction.REVERSE);
 
 
         
