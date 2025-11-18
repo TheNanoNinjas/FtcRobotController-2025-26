@@ -124,7 +124,7 @@ public class FTCNanoNinjasCode extends LinearOpMode {
 
 
 
-        fr_motor.setDirection(DcMotor.Direction.REVERSE);
+        fl_motor.setDirection(DcMotor.Direction.REVERSE);
         bl_motor.setDirection(DcMotor.Direction.REVERSE);
 
 
