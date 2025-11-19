@@ -173,8 +173,8 @@ public class FTCNanoNinjasCode extends LinearOpMode {
 
     private void launchArtifacts() {
         if (gamepad2.square) {
-            rightShooter.setPower(0.75);
-            leftShooter.setPower(0.75);
+            rightShooter.setPower(0.6);
+            leftShooter.setPower(0.6);
         } else {
             rightShooter.setPower(0);
             leftShooter.setPower(0);
@@ -195,8 +195,8 @@ public class FTCNanoNinjasCode extends LinearOpMode {
 
     private void launchArtifactsFar() {
         if (gamepad2.circle) {
-            rightShooter.setPower(0.82);
-            leftShooter.setPower(0.82);
+            rightShooter.setPower(0.78);
+            leftShooter.setPower(0.78);
             intakeMotor.setPower(1.0);
             wheelMotor.setPower(1.0);
         } else {
