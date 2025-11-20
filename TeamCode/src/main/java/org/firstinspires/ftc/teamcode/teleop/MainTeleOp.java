@@ -37,7 +37,6 @@ public class MainTeleOp extends LinearOpMode {
             handleShooting();
             handleIntake();
             handlePush();
-            launchArtifactsFar();
             launchArtifacts();
             releaseArtifacts();
         }
