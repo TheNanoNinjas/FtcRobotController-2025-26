@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-public class Push {
+public class ArtifactPusher {
 
     private RobotHardware robot;
 
-    public Push(RobotHardware robot) {
+    public ArtifactPusher(RobotHardware robot) {
         this.robot = robot;
     }
 

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
-import org.firstinspires.ftc.teamcode.mechanisms.Push;
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
 @Autonomous(name = "Auto Red Alliance", group = "Competition")
@@ -20,7 +20,7 @@ public class AutoRed extends LinearOpMode {
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
-    private Push pushArtifacts;
+    private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
 
     private GoBildaPinpointDriver odo;
@@ -37,7 +37,7 @@ public class AutoRed extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        pushArtifacts = new Push(robot);
+        artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
 
@@ -212,13 +212,13 @@ public class AutoRed extends LinearOpMode {
         shooter.startShooting();
         sleep(1000);
         intake.startPushing();
-        pushArtifacts.startWheel();
+        artifactPusherArtifacts.startWheel();
         sleep(6000);
 
         // Stop shooter
         shooter.stopShooting();
         intake.stopPushing();
-        pushArtifacts.stopPushing();
+        artifactPusherArtifacts.stopPushing();
 
         telemetry.addLine("Artifact launch completed");
         telemetry.update();

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
-import org.firstinspires.ftc.teamcode.mechanisms.Push;
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
@@ -15,7 +15,7 @@ public class MainTeleOp extends LinearOpMode {
     MecanumDrive drive;
     Shooter shooter;
     Intaker intake;
-    Push pushArtifacts;
+    ArtifactPusher artifactPusher;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,7 +24,7 @@ public class MainTeleOp extends LinearOpMode {
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
         intake = new Intaker(robot);
-        pushArtifacts = new Push(robot);
+        artifactPusher = new ArtifactPusher(robot);
 
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
@@ -82,9 +82,9 @@ public class MainTeleOp extends LinearOpMode {
 
     private void handlePush(){
         if (gamepad2.left_bumper){
-            pushArtifacts.startWheel();
+            artifactPusher.startWheel();
         }else {
-            pushArtifacts.stopPushing();
+            artifactPusher.stopPushing();
         }
     }
     private void launchArtifactsClose() {
@@ -92,11 +92,11 @@ public class MainTeleOp extends LinearOpMode {
             shooter.startShootingClose();
             sleep(1000);
             intake.startPushing();
-            pushArtifacts.startWheel();
+            artifactPusher.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();
-            pushArtifacts.stopPushing();
+            artifactPusher.stopPushing();
         }
     }
 
@@ -105,18 +105,18 @@ public class MainTeleOp extends LinearOpMode {
            shooter.startShooting();
            sleep(1000);
             intake.startPushing();
-            pushArtifacts.startWheel();
+            artifactPusher.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();
-            pushArtifacts.stopPushing();
+            artifactPusher.stopPushing();
         }
     }
 
     private void releaseArtifacts(){
         if (gamepad2.right_stick_button){
             intake.reversePush();
-            pushArtifacts.reversePush();
+            artifactPusher.reversePush();
         }
     }
 }
