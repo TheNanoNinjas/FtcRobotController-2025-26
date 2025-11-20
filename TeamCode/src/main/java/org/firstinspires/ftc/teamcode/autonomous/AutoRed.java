@@ -209,7 +209,7 @@ public class AutoRed extends LinearOpMode {
 
     private void launchArtifacts() {
         // Start shooter motors
-        shooter.startShooting();
+        shooter.startShootingFar();
         sleep(1000);
         intake.startPushing();
         artifactPusherArtifacts.startWheel();

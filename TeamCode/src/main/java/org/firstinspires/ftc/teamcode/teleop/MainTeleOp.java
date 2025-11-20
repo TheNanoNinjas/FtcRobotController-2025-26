@@ -66,7 +66,7 @@ public class MainTeleOp extends LinearOpMode {
 
     private void handleShooting() {
         if (gamepad2.right_bumper) {
-            shooter.startShooting();
+            shooter.startShootingFar();
         } else {
             shooter.stopShooting();
         }
@@ -102,7 +102,7 @@ public class MainTeleOp extends LinearOpMode {
 
     private void launchArtifactsFar() {
         if (gamepad2.circle) {
-           shooter.startShooting();
+           shooter.startShootingFar();
            sleep(1000);
             intake.startPushing();
             artifactPusher.startWheel();
