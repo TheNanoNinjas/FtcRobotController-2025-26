@@ -38,7 +38,7 @@ public class MainTeleOp extends LinearOpMode {
             handleIntake();
             handlePush();
             launchArtifactsFar();
-            launchArtifactsClose();
+            launchArtifacts();
             releaseArtifacts();
         }
     }
@@ -87,31 +87,28 @@ public class MainTeleOp extends LinearOpMode {
             artifactPusher.stopPushing();
         }
     }
-    private void launchArtifactsClose() {
+    private void launchArtifacts() {
+        //Square is for Close range shooting
         if (gamepad2.square) {
             shooter.startShootingClose();
             sleep(1000);
             intake.startPushing();
             artifactPusher.startWheel();
-        } else {
+        }
+        //Circle is for Close range shooting
+        else if(gamepad2.circle){
+            shooter.startShootingFar();
+            sleep(1000);
+            intake.startPushing();
+            artifactPusher.startWheel();
+
+        }else {
             shooter.stopShooting();
             intake.stopPushing();
             artifactPusher.stopPushing();
         }
     }
 
-    private void launchArtifactsFar() {
-        if (gamepad2.circle) {
-           shooter.startShootingFar();
-           sleep(1000);
-            intake.startPushing();
-            artifactPusher.startWheel();
-        } else {
-            shooter.stopShooting();
-            intake.stopPushing();
-            artifactPusher.stopPushing();
-        }
-    }
 
     private void releaseArtifacts(){
         if (gamepad2.right_stick_button){
