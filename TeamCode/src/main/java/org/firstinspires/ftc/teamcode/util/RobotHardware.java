@@ -64,6 +64,7 @@ public class RobotHardware {
         leftShooter.setPower(0);
         rightShooter.setPower(0);
         intakeMotor.setPower(0);
+        wheelMotor.setPower(0);
     }
 
     public void logHardwareStatus(Telemetry telemetry) {
