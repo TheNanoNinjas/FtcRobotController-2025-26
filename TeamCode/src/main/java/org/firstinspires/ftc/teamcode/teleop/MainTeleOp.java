@@ -44,10 +44,9 @@ public class MainTeleOp extends LinearOpMode {
 
     private void handleDriving() {
         // Reset IMU heading with A button
-        if (gamepad1.a) {
+        if (gamepad1.dpad_up) {
             robot.imu.resetYaw();
         }
-
         // Field-relative drive (default) or robot-relative (right bumper)
         if (gamepad1.right_bumper) {
             // Robot-relative drive
@@ -82,7 +81,7 @@ public class MainTeleOp extends LinearOpMode {
     private void handlePush(){
         if (gamepad2.left_bumper){
             artifactPusher.startWheel();
-        }else {
+        } else {
             artifactPusher.stopPushing();
         }
     }
