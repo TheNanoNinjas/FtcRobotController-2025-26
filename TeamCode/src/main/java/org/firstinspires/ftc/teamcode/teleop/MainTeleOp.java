@@ -27,6 +27,7 @@ public class MainTeleOp extends LinearOpMode {
         gate = new Gate(robot);
 
         robot.logHardwareStatus(telemetry);
+        robot.displayPortMapping(telemetry);
         telemetry.update();
 
         waitForStart();

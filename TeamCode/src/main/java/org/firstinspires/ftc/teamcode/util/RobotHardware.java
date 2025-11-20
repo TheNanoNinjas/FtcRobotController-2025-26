@@ -80,4 +80,17 @@ public class RobotHardware {
         telemetry.addData("Gate Servo", gateServo != null ? "OK" : "FAIL");
         telemetry.addData("Hardware", "Initialized");
     }
+    
+    public void displayPortMapping(Telemetry telemetry) {
+        telemetry.addLine("=== PORT MAPPING ===");
+        if (fl_motor != null) telemetry.addData("FL Motor", "Port " + fl_motor.getPortNumber());
+        if (fr_motor != null) telemetry.addData("FR Motor", "Port " + fr_motor.getPortNumber());
+        if (bl_motor != null) telemetry.addData("BL Motor", "Port " + bl_motor.getPortNumber());
+        if (br_motor != null) telemetry.addData("BR Motor", "Port " + br_motor.getPortNumber());
+        if (leftShooter != null) telemetry.addData("Left Shooter", "Port " + leftShooter.getPortNumber());
+        if (rightShooter != null) telemetry.addData("Right Shooter", "Port " + rightShooter.getPortNumber());
+        if (pushMotor != null) telemetry.addData("Push Motor", "Port " + pushMotor.getPortNumber());
+        if (gateServo != null) telemetry.addData("Gate Servo", "Port " + gateServo.getPortNumber());
+        telemetry.addLine("===================");
+    }
 }
