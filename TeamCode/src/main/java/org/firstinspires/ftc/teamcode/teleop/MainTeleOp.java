@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.mechanisms.Gate;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
+import org.firstinspires.ftc.teamcode.mechanisms.Push;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
@@ -15,7 +15,7 @@ public class MainTeleOp extends LinearOpMode {
     MecanumDrive drive;
     Shooter shooter;
     Intaker intake;
-    Gate gate;
+    Push pushArtifacts;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,7 +24,7 @@ public class MainTeleOp extends LinearOpMode {
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
         intake = new Intaker(robot);
-        gate = new Gate(robot);
+        pushArtifacts = new Push(robot);
 
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
@@ -36,7 +36,10 @@ public class MainTeleOp extends LinearOpMode {
             handleDriving();
             handleShooting();
             handleIntake();
-            handleGate();
+            handlePush();
+            launchArtifactsFar();
+            launchArtifactsClose();
+            releaseArtifacts();
         }
     }
 
@@ -46,8 +49,8 @@ public class MainTeleOp extends LinearOpMode {
             robot.imu.resetYaw();
         }
 
-        // Field-relative drive (default) or robot-relative (left bumper)
-        if (gamepad1.left_bumper) {
+        // Field-relative drive (default) or robot-relative (right bumper)
+        if (gamepad1.right_bumper) {
             // Robot-relative drive
             drive.mecanumDrive(-gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
@@ -70,18 +73,50 @@ public class MainTeleOp extends LinearOpMode {
     }
 
     private void handleIntake() {
-        if (gamepad2.left_bumper) {
+        if (gamepad1.left_bumper) {
             intake.startPushing();
         } else {
             intake.stopPushing();
         }
     }
 
-    private void handleGate() {
-        if (gamepad2.triangle) {
-            gate.openGate();
+    private void handlePush(){
+        if (gamepad2.left_bumper){
+            pushArtifacts.startWheel();
+        }else {
+            pushArtifacts.stopPushing();
+        }
+    }
+    private void launchArtifactsClose() {
+        if (gamepad2.square) {
+            shooter.startShootingClose();
+            sleep(1000);
+            intake.startPushing();
+            pushArtifacts.startWheel();
         } else {
-            gate.closeGate();
+            shooter.stopShooting();
+            intake.stopPushing();
+            pushArtifacts.stopPushing();
+        }
+    }
+
+    private void launchArtifactsFar() {
+        if (gamepad2.circle) {
+           shooter.startShooting();
+           sleep(1000);
+            intake.startPushing();
+            pushArtifacts.startWheel();
+        } else {
+            shooter.stopShooting();
+            intake.stopPushing();
+            pushArtifacts.stopPushing();
+        }
+    }
+
+    private void releaseArtifacts(){
+        if (gamepad2.right_stick_button){
+            intake.reversePush();
+            pushArtifacts.reversePush();
         }
     }
 }

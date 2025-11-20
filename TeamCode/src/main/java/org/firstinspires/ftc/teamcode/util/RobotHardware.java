@@ -17,10 +17,9 @@ public class RobotHardware {
     // Mechanism Motors
     public DcMotor leftShooter;
     public DcMotor rightShooter;
-    public DcMotor pushMotor;
+    public DcMotor intakeMotor;
+    public DcMotor wheelMotor;
 
-    // Servos
-    public Servo gateServo;
 
     // Sensors
     public IMU imu;
@@ -39,13 +38,11 @@ public class RobotHardware {
         // Mechanism Motors
         leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
         rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
-        pushMotor = hardwareMap.get(DcMotor.class, "pushMotor");
-
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        wheelMotor = hardwareMap.get(DcMotor.class, "wheelMotor");
         // Set shooter direction
         rightShooter.setDirection(DcMotor.Direction.REVERSE);
 
-        // Servos
-        gateServo = hardwareMap.get(Servo.class, "gateServo");
 
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
@@ -66,7 +63,7 @@ public class RobotHardware {
         setDrivePower(0, 0, 0, 0);
         leftShooter.setPower(0);
         rightShooter.setPower(0);
-        pushMotor.setPower(0);
+        intakeMotor.setPower(0);
     }
 
     public void logHardwareStatus(Telemetry telemetry) {
@@ -76,8 +73,8 @@ public class RobotHardware {
         telemetry.addData("BR Motor", br_motor != null ? "OK" : "FAIL");
         telemetry.addData("Left Shooter", leftShooter != null ? "OK" : "FAIL");
         telemetry.addData("Right Shooter", rightShooter != null ? "OK" : "FAIL");
-        telemetry.addData("Push Motor", pushMotor != null ? "OK" : "FAIL");
-        telemetry.addData("Gate Servo", gateServo != null ? "OK" : "FAIL");
+        telemetry.addData("Intake Motor", intakeMotor != null ? "OK" : "FAIL");
+        telemetry.addData("Wheel Motor", wheelMotor != null ? "OK" : "FAIL");
         telemetry.addData("Hardware", "Initialized");
     }
     
@@ -89,8 +86,8 @@ public class RobotHardware {
         if (br_motor != null) telemetry.addData("BR Motor", "Port " + br_motor.getPortNumber());
         if (leftShooter != null) telemetry.addData("Left Shooter", "Port " + leftShooter.getPortNumber());
         if (rightShooter != null) telemetry.addData("Right Shooter", "Port " + rightShooter.getPortNumber());
-        if (pushMotor != null) telemetry.addData("Push Motor", "Port " + pushMotor.getPortNumber());
-        if (gateServo != null) telemetry.addData("Gate Servo", "Port " + gateServo.getPortNumber());
+        if (intakeMotor != null) telemetry.addData("Intake Motor", "Port " + intakeMotor.getPortNumber());
+        if (wheelMotor != null) telemetry.addData("Wheel Motor", "Port " + intakeMotor.getPortNumber());
         telemetry.addLine("===================");
     }
 }

@@ -10,8 +10,13 @@ public class Shooter {
     }
 
     public void startShooting() {
-        robot.leftShooter.setPower(1.0);
-        robot.rightShooter.setPower(1.0);
+        robot.leftShooter.setPower(0.8);
+        robot.rightShooter.setPower(0.8);
+    }
+
+    public void startShootingClose() {
+        robot.leftShooter.setPower(0.7);
+        robot.rightShooter.setPower(0.7);
     }
 
     public void stopShooting() {
