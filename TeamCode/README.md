@@ -7,9 +7,11 @@ This codebase implements a modular, subsystem-based architecture for the 2025-26
 
 ### Main OpMode
 **`MainTeleOp.java`** - Primary driver-controlled OpMode
-- Coordinates all subsystems
+- Coordinates all mechanisms
 - Handles gamepad input
 - Provides dual drive modes (field-relative and robot-relative)
+- Multiple shooting modes (close/far range)
+- Manual intake capabilities
 
 ### Hardware Layer
 **`RobotHardware.java`** - Centralized hardware management
@@ -22,7 +24,7 @@ This codebase implements a modular, subsystem-based architecture for the 2025-26
 - **Drive Motors:** `fl_motor`, `fr_motor`, `bl_motor`, `br_motor`
 - **Shooter Motors:** `leftShooter`, `rightShooter`
 - **Intake Motor:** `pushMotor`
-- **Servo:** `gateServo`
+- **Artifact Pusher Motor:** `artifactPusher`
 - **Sensor:** `imu` (for field-relative driving)
 
 ### Mechanisms Layer (`mechanisms` package)
@@ -51,14 +53,13 @@ This codebase implements a modular, subsystem-based architecture for the 2025-26
   - `reversePush()` - Reverse intake direction
   - `setPushPower(power)` - Variable power control
 
-#### **`Gate.java`**
-- Controls servo-based gate mechanism
+#### **`ArtifactPusher.java`**
+- Controls artifact pusher wheel mechanism
 - **Methods:**
-  - `openGate()` - Move to open position (0.5)
-  - `closeGate()` - Move to closed position (-1.0)
-  - `setGatePosition(position)` - Custom positioning
-  - `getGatePosition()` - Current position
-  - `isOpen()` - Status check
+  - `startWheel()` - Start pusher wheel
+  - `stopPushing()` - Stop pusher motor
+  - `reversePush()` - Reverse pusher direction
+  - `setPusherPower(power)` - Variable power control
 
 ## Control Scheme
 
@@ -66,13 +67,16 @@ This codebase implements a modular, subsystem-based architecture for the 2025-26
 - **Left Stick Y:** Forward/Backward movement
 - **Left Stick X:** Left/Right strafing
 - **Right Stick X:** Rotation
-- **Left Bumper:** Switch to robot-relative drive mode
-- **A Button:** Reset IMU heading (field-relative calibration)
+- **Right Bumper:** Switch to robot-relative drive mode
+- **Left Bumper:** Manual intake operation
+- **Cross Button:** Reset IMU heading (field-relative calibration)
 
 ### Gamepad 2 (Operator)
-- **Right Bumper:** Activate shooter
-- **Left Bumper:** Activate intake/pusher
-- **Triangle:** Toggle gate (open/close)
+- **Right Bumper:** Close range shooting
+- **Left Bumper:** Far range shooting
+- **Cross Button:** Combined intake and artifact pusher
+- **Square Button:** Manual intake shooter
+- **Right Stick Button:** Release artifacts (reverse intake and pusher)
 
 ## Drive Modes
 
@@ -82,7 +86,7 @@ This codebase implements a modular, subsystem-based architecture for the 2025-26
 - Uses IMU for orientation correction
 - Easier for drivers to control
 
-### Robot-Relative Drive (Left Bumper)
+### Robot-Relative Drive (Right Bumper)
 - Traditional RC car-style control
 - Forward moves in robot's current forward direction
 - Useful for precise maneuvering
@@ -113,7 +117,7 @@ TeamCode/src/main/java/org/firstinspires/ftc/teamcode/
 │   ├── MecanumDrive.java     # Drive train control
 │   ├── Shooter.java          # Shooter mechanism control
 │   ├── Intaker.java          # Intake/pusher control
-│   └── Gate.java             # Gate servo control
+│   └── ArtifactPusher.java   # Artifact pusher control
 ├── util/
 │   ├── RobotHardware.java    # Hardware initialization and management
 │   └── Constants.java        # Robot constants and configurations
@@ -151,22 +155,45 @@ robot.init(hardwareMap);
 
 MecanumDrive drive = new MecanumDrive(robot);
 Shooter shooter = new Shooter(robot);
+Intaker intake = new Intaker(robot);
+ArtifactPusher artifactPusher = new ArtifactPusher(robot);
 
 // Use in OpMode
 drive.mecanumDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
 if (gamepad2.right_bumper) {
-    shooter.startShooting();
+    shooter.startShootingClose();  // Close range
+} else if (gamepad2.left_bumper) {
+    shooter.startShootingFar();    // Far range
 } else {
     shooter.stopShooting();
 }
 ```
 
+## Advanced Features
+
+### **Multiple Shooting Modes**
+- **Close Range:** Optimized power for nearby targets
+- **Far Range:** Higher power for distant shots
+- **Manual Intake:** Reverse shooter for artifact collection
+
+### **Combined Operations**
+- **Coordinated Intake:** Simultaneous intake and artifact pusher
+- **Artifact Release:** Reverse both systems to eject artifacts
+- **Manual Control:** Individual mechanism control for fine-tuning
+
+### **Drive Modes**
+- **Field-Relative (Default):** Consistent directional control
+- **Robot-Relative:** Traditional RC car-style control
+- **IMU Reset:** Recalibrate field orientation
+
 ## Future Enhancements
-- Add autonomous OpModes using the same subsystems
+- Add autonomous OpModes using the same mechanisms
 - Implement PID control for precise movements
 - Add sensor feedback for closed-loop control
 - Create utility classes for common autonomous functions
 - Add telemetry and logging for match analysis
+- Implement preset shooting positions
+- Add automatic artifact detection and targeting
 
 ---
 **Team 25756 Nano Ninjas - 2025-26 DECODE Season**
