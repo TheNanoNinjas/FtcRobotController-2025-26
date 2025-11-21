@@ -39,12 +39,13 @@ public class MainTeleOp extends LinearOpMode {
             handlePush();
             launchArtifacts();
             releaseArtifacts();
+            manualIntake();
         }
     }
 
     private void handleDriving() {
         // Reset IMU heading with A button
-        if (gamepad1.a) {
+        if (gamepad1.cross) {
             robot.imu.resetYaw();
         }
 
@@ -79,32 +80,42 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
+    private void manualIntake(){
+        if (gamepad2.square){
+            shooter.manualIntakeShooter();
+        }else {
+           shooter.stopShooting();
+        }
+    }
+
     private void handlePush(){
-        if (gamepad2.left_bumper){
+        if (gamepad2.cross){
             artifactPusher.startWheel();
+            intake.startPushing();
         }else {
             artifactPusher.stopPushing();
+            intake.stopPushing();
         }
     }
     private void launchArtifacts() {
         //Square is for Close range shooting
-        if (gamepad2.square) {
+        if (gamepad2.right_bumper) {
             shooter.startShootingClose();
-            sleep(1000);
-            intake.startPushing();
-            artifactPusher.startWheel();
+           // sleep(1000);
+            //intake.startPushing();
+            //artifactPusher.startWheel();
         }
-        //Circle is for Close range shooting
-        else if(gamepad2.circle){
+        //Circle is for Far range shooting
+        else if(gamepad2.left_bumper){
             shooter.startShootingFar();
-            sleep(1000);
-            intake.startPushing();
-            artifactPusher.startWheel();
+         //   sleep(1000);
+            //intake.startPushing();
+            //artifactPusher.startWheel();
 
         }else {
             shooter.stopShooting();
-            intake.stopPushing();
-            artifactPusher.stopPushing();
+            //intake.stopPushing();
+            //artifactPusher.stopPushing();
         }
     }
 

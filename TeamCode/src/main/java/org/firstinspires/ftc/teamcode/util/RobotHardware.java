@@ -41,7 +41,7 @@ public class RobotHardware {
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         wheelMotor = hardwareMap.get(DcMotor.class, "wheelMotor");
         // Set shooter direction
-        rightShooter.setDirection(DcMotor.Direction.REVERSE);
+        leftShooter.setDirection(DcMotor.Direction.REVERSE);
 
 
         // IMU

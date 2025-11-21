@@ -9,9 +9,17 @@ public class Shooter {
         this.robot = robot;
     }
 
+
+
     public void startShootingFar() {
         robot.leftShooter.setPower(0.8);
         robot.rightShooter.setPower(0.8);
+    }
+
+
+    public void manualIntakeShooter() {
+        robot.leftShooter.setPower(-0.5);
+        robot.rightShooter.setPower(-0.5);
     }
 
     public void startShootingClose() {

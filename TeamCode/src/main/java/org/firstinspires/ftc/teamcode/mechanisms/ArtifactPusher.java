@@ -11,7 +11,7 @@ public class ArtifactPusher {
     }
 
     public void startWheel() {
-        robot.wheelMotor.setPower(1.0);
+        robot.wheelMotor.setPower(.75);
     }
 
     public void stopPushing() {
