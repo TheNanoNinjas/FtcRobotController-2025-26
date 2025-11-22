@@ -34,12 +34,12 @@ public class MainTeleOp extends LinearOpMode {
 
         while (opModeIsActive()) {
             handleDriving();
-            handleShooting();
+           // handleShooting();
             handleIntake();
             handlePush();
             launchArtifacts();
             releaseArtifacts();
-            manualIntake();
+
         }
     }
 
@@ -64,37 +64,36 @@ public class MainTeleOp extends LinearOpMode {
         }
     }
 
-    private void handleShooting() {
+ /*   private void handleShooting() {
         if (gamepad2.right_bumper) {
             shooter.startShootingFar();
         } else {
             shooter.stopShooting();
         }
-    }
+    }*/
 
     private void handleIntake() {
         if (gamepad1.left_bumper) {
             intake.startPushing();
-        } else {
+            intake.startPushing();
+        }else if(gamepad2.cross){
+            intake.startPushing();
+        } else if(gamepad2.right_stick_button){
+            intake.reversePush();
+        }
+        else {
             intake.stopPushing();
         }
     }
 
-    private void manualIntake(){
-        if (gamepad2.square){
-            shooter.manualIntakeShooter();
-        }else {
-           shooter.stopShooting();
-        }
-    }
 
     private void handlePush(){
         if (gamepad2.cross){
             artifactPusher.startWheel();
-            intake.startPushing();
+           // intake.startPushing();
         }else {
             artifactPusher.stopPushing();
-            intake.stopPushing();
+           // intake.stopPushing();
         }
     }
     private void launchArtifacts() {
@@ -112,7 +111,10 @@ public class MainTeleOp extends LinearOpMode {
             //intake.startPushing();
             //artifactPusher.startWheel();
 
-        }else {
+        }else if(gamepad2.square){
+            shooter.manualIntakeShooter();
+        }
+        else {
             shooter.stopShooting();
             //intake.stopPushing();
             //artifactPusher.stopPushing();
@@ -124,6 +126,9 @@ public class MainTeleOp extends LinearOpMode {
         if (gamepad2.right_stick_button){
             intake.reversePush();
             artifactPusher.reversePush();
+        } else {
+          //  intake.stopPushing();
+            artifactPusher.stopPushing();
         }
     }
 }

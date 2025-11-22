@@ -9,7 +9,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 
 @TeleOp(name = "OpMode Test")
-public class OpModeTest extends OpMode {
+public class
+OpModeTest extends OpMode {
     RobotHardware robot = new RobotHardware();
     MecanumDrive drive;
     Shooter shooter;

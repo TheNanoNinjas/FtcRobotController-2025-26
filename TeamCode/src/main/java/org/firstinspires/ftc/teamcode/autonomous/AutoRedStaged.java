@@ -27,7 +27,7 @@ public class AutoRedStaged extends OpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
-    private static final double TARGET_Y_INCHES = 10.0;
+    private static final double TARGET_Y_INCHES = 5.0;
     private static final double SECOND_TARGET_Y = 20;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
@@ -82,7 +82,7 @@ public class AutoRedStaged extends OpMode {
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         //change the offsets to however far our odometry pods are from the dead center of the robot
         //x offset is for the side to side one, y offset is for the forward back one
-        odo.setOffsets(-82.5, 0.0);
+        odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,
@@ -138,7 +138,7 @@ public class AutoRedStaged extends OpMode {
             robot.br_motor.setPower(turnPower);
         }
         
-        telemetry.addData("Target Heading", 40);
+        telemetry.addData("Target Heading", 345);
         telemetry.addData("Current Heading", currentHeading);
     }
     
@@ -178,10 +178,6 @@ public class AutoRedStaged extends OpMode {
         
         telemetry.addData("Final Turn Heading", currentHeading);
     }
-
-
-
-
 
 
     private void driveForward(double power) {

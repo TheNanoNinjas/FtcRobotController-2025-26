@@ -5,6 +5,12 @@ import org.firstinspires.ftc.teamcode.util.RobotHardware;
 public class Shooter {
     private RobotHardware robot;
 
+    private static double LONG_RANGE_POWER = 0.59;
+    private static double SHORT_RANGE_POWER = 0.55;
+
+    private static double MANUAL_INTAKE_POWER = -0.5;
+
+
     public Shooter(RobotHardware robot) {
         this.robot = robot;
     }
@@ -12,19 +18,19 @@ public class Shooter {
 
 
     public void startShootingFar() {
-        robot.leftShooter.setPower(0.8);
-        robot.rightShooter.setPower(0.8);
+        robot.leftShooter.setPower(LONG_RANGE_POWER);
+        robot.rightShooter.setPower(LONG_RANGE_POWER);
     }
 
 
     public void manualIntakeShooter() {
-        robot.leftShooter.setPower(-0.5);
-        robot.rightShooter.setPower(-0.5);
+        robot.leftShooter.setPower(MANUAL_INTAKE_POWER);
+        robot.rightShooter.setPower(MANUAL_INTAKE_POWER);
     }
 
     public void startShootingClose() {
-        robot.leftShooter.setPower(0.7);
-        robot.rightShooter.setPower(0.7);
+        robot.leftShooter.setPower(SHORT_RANGE_POWER);
+        robot.rightShooter.setPower(SHORT_RANGE_POWER);
     }
 
     public void stopShooting() {
