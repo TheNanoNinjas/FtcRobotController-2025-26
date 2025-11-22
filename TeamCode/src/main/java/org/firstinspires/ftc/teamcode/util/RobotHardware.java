@@ -88,7 +88,7 @@ public class RobotHardware {
         if (leftShooter != null) telemetry.addData("Left Shooter", "Port " + leftShooter.getPortNumber());
         if (rightShooter != null) telemetry.addData("Right Shooter", "Port " + rightShooter.getPortNumber());
         if (intakeMotor != null) telemetry.addData("Intake Motor", "Port " + intakeMotor.getPortNumber());
-        if (wheelMotor != null) telemetry.addData("Wheel Motor", "Port " + intakeMotor.getPortNumber());
+        if (wheelMotor != null) telemetry.addData("Wheel Motor", "Port " + wheelMotor.getPortNumber());
         telemetry.addLine("===================");
     }
 }
