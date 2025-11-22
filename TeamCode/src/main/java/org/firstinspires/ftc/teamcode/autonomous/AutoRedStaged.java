@@ -27,8 +27,9 @@ public class AutoRedStaged extends OpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
-    private static final double TARGET_Y_INCHES = 5.0;
-    private static final double SECOND_TARGET_Y = 20;
+    private static final double TARGET_Y_INCHES = 10.0;
+    private static final double SECOND_TARGET_Y = 21;
+    private static final double INTAKE_MOVE_Y = 32;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -57,17 +58,37 @@ public class AutoRedStaged extends OpMode {
 
     @Override
     public void loop() {
-        if (STAGE == 1) {
-            moveToTargetStage();
-        } else if (STAGE == 2) {
-            turnToShootingAngle();
-        } else if (STAGE == 3) {
-            launchArtifactsStage();
-        } else if (STAGE == 4) {
-            turnToZeroStage();
-        } else {
-            drive.stop();
-            shooter.stopShooting();
+        switch (STAGE) {
+            case 1:
+                moveToTargetStage();
+                break;
+            case 2:
+                turnToShootingAngle();
+                break;
+            case 3:
+                launchArtifactsStage();
+                break;
+            case 4:
+                turnToZeroStage();
+                break;
+            case 5:
+                moveToSecondTargetStage();
+                break;
+            case 6:
+                turnTo270Stage();
+                break;
+            case 7:
+                intakeArtifactsStage();
+                break;
+            case 8:
+                moveIntakeStage();
+                break;
+            default:
+                drive.stop();
+                shooter.stopShooting();
+                intake.stopPushing();
+                artifactPusherArtifacts.stopPushing();
+                break;
         }
         
         telemetry.addData("Current Stage", STAGE);
@@ -123,7 +144,7 @@ public class AutoRedStaged extends OpMode {
     private void turnToShootingAngle() {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
-        double error = 40 - currentHeading;
+        double error = 338 - currentHeading;
         error = ((error + 180) % 360) - 180;
         
         if (Math.abs(error) <= 1.0) {
@@ -138,14 +159,16 @@ public class AutoRedStaged extends OpMode {
             robot.br_motor.setPower(turnPower);
         }
         
-        telemetry.addData("Target Heading", 345);
+        telemetry.addData("Target Heading", 338);
         telemetry.addData("Current Heading", currentHeading);
     }
     
     private void launchArtifactsStage() {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
-        } else if (stageTimer.seconds() < 7.0) {
+        } else if (stageTimer.seconds() < 2.0) {
+            artifactPusherArtifacts.startWheel();
+        } else if (stageTimer.seconds() < 4.0) {
             intake.startPushing();
             artifactPusherArtifacts.startWheel();
         } else {
@@ -167,7 +190,8 @@ public class AutoRedStaged extends OpMode {
         
         if (Math.abs(error) <= 1.0) {
             drive.stop();
-            STAGE = 5; // Complete
+            STAGE = 5;
+            stageTimer.reset();
         } else {
             double turnPower = 0.2 * Math.signum(error);
             robot.fl_motor.setPower(-turnPower);
@@ -176,7 +200,97 @@ public class AutoRedStaged extends OpMode {
             robot.br_motor.setPower(turnPower);
         }
         
-        telemetry.addData("Final Turn Heading", currentHeading);
+        telemetry.addData("Turn to 0 Heading", currentHeading);
+    }
+    
+    private void moveToSecondTargetStage() {
+        odo.update();
+        Pose2D pos = odo.getPosition();
+        
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = SECOND_TARGET_Y - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+        
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+        
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+        
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            STAGE = 6;
+            stageTimer.reset();
+        } else {
+            driveForward(drivePower);
+        }
+        
+        telemetry.addData("Second Target Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+    }
+    
+    private void turnTo270Stage() {
+        odo.update();
+        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+        double error = 270 - currentHeading;
+        error = ((error + 180) % 360) - 180;
+        
+        if (Math.abs(error) <= 1.0) {
+            drive.stop();
+            STAGE = 7;
+            stageTimer.reset();
+        } else {
+            double turnPower = 0.2 * Math.signum(error);
+            robot.fl_motor.setPower(-turnPower);
+            robot.bl_motor.setPower(-turnPower);
+            robot.fr_motor.setPower(turnPower);
+            robot.br_motor.setPower(turnPower);
+        }
+        
+        telemetry.addData("Turn to 270 Heading", currentHeading);
+    }
+    
+    private void intakeArtifactsStage() {
+        if (stageTimer.seconds() < 5.0) {
+            intake.startPushing();
+        } else {
+            intake.stopPushing();
+            STAGE = 8;
+            stageTimer.reset();
+        }
+        
+        telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
+    }
+    
+    private void moveIntakeStage() {
+        odo.update();
+        Pose2D pos = odo.getPosition();
+        
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = INTAKE_MOVE_Y - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+        
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+        
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+        
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            STAGE = 9; // Complete
+        } else {
+            driveForward(drivePower);
+        }
+        
+        telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
 
 
