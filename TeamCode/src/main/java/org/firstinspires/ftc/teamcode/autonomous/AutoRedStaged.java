@@ -66,22 +66,26 @@ public class AutoRedStaged extends OpMode {
                 turnToShootingAngle();
                 break;
             case 3:
-                launchArtifactsStage();
+                drive.stop();
+                shooter.stopShooting();
+                intake.stopPushing();
+                artifactPusherArtifacts.stopPushing();
+               // launchArtifactsStage();
                 break;
             case 4:
-                turnToZeroStage();
+               // turnToZeroStage();
                 break;
             case 5:
-                moveToSecondTargetStage();
+                //moveToSecondTargetStage();
                 break;
             case 6:
-                turnTo270Stage();
+                //turnTo270Stage();
                 break;
             case 7:
-                intakeArtifactsStage();
+                //intakeArtifactsStage();
                 break;
             case 8:
-                moveIntakeStage();
+                //moveIntakeStage();
                 break;
             default:
                 drive.stop();
