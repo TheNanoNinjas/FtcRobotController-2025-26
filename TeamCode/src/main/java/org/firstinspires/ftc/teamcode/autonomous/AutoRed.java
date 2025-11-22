@@ -28,7 +28,9 @@ public class AutoRed extends LinearOpMode {
 
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 21;
-    private static final double INTAKE_MOVE_Y = 32;
+    private static final double INTAKE_TARGET_Y = -32;
+    private static final double MOVE_INTAKE_BACKWARDS_Y = -32;
+    private static final double MOVE_BACKWARDS_Y = -21;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -76,7 +78,7 @@ public class AutoRed extends LinearOpMode {
         moveToTarget();
 
         // Turn to shooting angle
-    turnToHeading(338);
+         turnToHeading(338);
 
         // Launch artifacts
        launchArtifacts();
@@ -85,12 +87,20 @@ public class AutoRed extends LinearOpMode {
 
        moveToY();
 
-       turnToHeading(270);
+        turnToHeading(90);
 
-       intakeArtifacts(5000);
+        intakeArtifacts(5000);
+        moveToIntakeY();
 
-       moveIntake();
+        moveBackwardsIntake();
 
+        turnToHeading(0);
+
+        moveBackwardsShoot();
+
+        turnToHeading(338);
+
+        launchArtifacts();
 
         drive.stop();
         shooter.stopShooting();
@@ -104,7 +114,7 @@ public class AutoRed extends LinearOpMode {
             double currentY = pos.getY(DistanceUnit.INCH);
             double error = TARGET_Y_INCHES - currentY;
             double drivePower = error * KP;
-            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
 
             double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
 
@@ -151,7 +161,7 @@ public class AutoRed extends LinearOpMode {
             double currentY = pos.getY(DistanceUnit.INCH);
             double error = SECOND_TARGET_Y - currentY;
             double drivePower = error * KP;
-            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
 
             double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
 
@@ -189,16 +199,15 @@ public class AutoRed extends LinearOpMode {
 
         drive.stop();
     }
-
-    private void moveIntake() {
+    private void moveToIntakeY() {
         while (opModeIsActive()) {
             odo.update();
             Pose2D pos = odo.getPosition();
 
             double currentY = pos.getY(DistanceUnit.INCH);
-            double error = INTAKE_MOVE_Y - currentY;
+            double error = INTAKE_TARGET_Y - currentY;
             double drivePower = error * KP;
-            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
 
             double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
 
@@ -237,6 +246,99 @@ public class AutoRed extends LinearOpMode {
         drive.stop();
     }
 
+
+    private void moveBackwardsIntake() {
+        while (opModeIsActive()) {
+            odo.update();
+            Pose2D pos = odo.getPosition();
+
+            double currentY = pos.getY(DistanceUnit.INCH);
+            double error = MOVE_INTAKE_BACKWARDS_Y - currentY;
+            double drivePower = error * KP;
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+
+            double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
+            boolean targetReached = Math.abs(error) < 1.0;
+            boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+            if (targetReached || obstacleClose) {
+                drive.stop();
+                telemetry.addLine("Movement stopped!");
+
+                if (targetReached) {
+                    telemetry.addLine("Reason: Target reached");
+                }
+                if (obstacleClose) {
+                    telemetry.addLine("Reason: Obstacle detected");
+                    telemetry.addLine("Backing up...");
+                    telemetry.update();
+
+                    // Back up from obstacle
+                    driveBackward(0.25, 900);
+                }
+                telemetry.update();
+                break;
+            }
+
+
+            driveForward(drivePower);
+
+            telemetry.addData("Current Y (in)", "%.2f", currentY);
+            telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+            telemetry.addData("Heading (deg)", pos.getHeading(AngleUnit.DEGREES));
+            telemetry.update();
+        }
+
+
+        drive.stop();
+    }
+    private void moveBackwardsShoot() {
+        while (opModeIsActive()) {
+            odo.update();
+            Pose2D pos = odo.getPosition();
+
+            double currentY = pos.getY(DistanceUnit.INCH);
+            double error = MOVE_BACKWARDS_Y - currentY;
+            double drivePower = error * KP;
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+
+            double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
+            boolean targetReached = Math.abs(error) < 1.0;
+            boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+            if (targetReached || obstacleClose) {
+                drive.stop();
+                telemetry.addLine("Movement stopped!");
+
+                if (targetReached) {
+                    telemetry.addLine("Reason: Target reached");
+                }
+                if (obstacleClose) {
+                    telemetry.addLine("Reason: Obstacle detected");
+                    telemetry.addLine("Backing up...");
+                    telemetry.update();
+
+                    // Back up from obstacle
+                    driveBackward(0.25, 900);
+                }
+                telemetry.update();
+                break;
+            }
+
+
+            driveForward(drivePower);
+
+            telemetry.addData("Current Y (in)", "%.2f", currentY);
+            telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+            telemetry.addData("Heading (deg)", pos.getHeading(AngleUnit.DEGREES));
+            telemetry.update();
+        }
+
+
+        drive.stop();
+    }
     private void turnToHeading(double targetHeading) {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
@@ -251,7 +353,7 @@ public class AutoRed extends LinearOpMode {
             error = targetHeading - currentHeading;
             error = ((error + 180) % 360) - 180;
 
-            double turnPower = 0.2 * Math.signum(error);
+            double turnPower = 0.3 * Math.signum(error);
 
             // Turn using drive motors
             robot.fl_motor.setPower(-turnPower);
@@ -277,7 +379,7 @@ public class AutoRed extends LinearOpMode {
 
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
-        sleep(2000);
+        sleep(1500);
 
         // Stop shooter
         shooter.stopShooting();

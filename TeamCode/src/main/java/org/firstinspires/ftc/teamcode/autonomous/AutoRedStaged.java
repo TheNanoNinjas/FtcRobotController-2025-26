@@ -66,19 +66,21 @@ public class AutoRedStaged extends OpMode {
                 turnToShootingAngle();
                 break;
             case 3:
-                drive.stop();
-                shooter.stopShooting();
-                intake.stopPushing();
-                artifactPusherArtifacts.stopPushing();
-               // launchArtifactsStage();
+
+               launchArtifactsStage();
                 break;
             case 4:
-               // turnToZeroStage();
+
+                try {
+                    turnToZeroStage();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case 5:
-                //moveToSecondTargetStage();
+                moveToSecondTargetStage();
                 break;
-            case 6:
+          /*  case 6:
                 //turnTo270Stage();
                 break;
             case 7:
@@ -87,7 +89,7 @@ public class AutoRedStaged extends OpMode {
             case 8:
                 //moveIntakeStage();
                 break;
-            default:
+          */  default:
                 drive.stop();
                 shooter.stopShooting();
                 intake.stopPushing();
@@ -186,13 +188,14 @@ public class AutoRedStaged extends OpMode {
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
     
-    private void turnToZeroStage() {
+    private void turnToZeroStage() throws InterruptedException {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 0 - currentHeading;
         error = ((error + 180) % 360) - 180;
         
         if (Math.abs(error) <= 1.0) {
+            Thread.sleep(100);
             drive.stop();
             STAGE = 5;
             stageTimer.reset();
