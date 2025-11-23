@@ -68,45 +68,76 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void executeAutonomousSequence() {
+        telemetry.addLine("Starting autonomous sequence");
+        telemetry.update();
+        
         // Move forward to shooting position
+        telemetry.addLine("Moving to shooting position (Y=10)");
+        telemetry.update();
         moveToYTarget(10);
 
         // Turn to shooting angle
+        telemetry.addLine("Turning to shooting angle (338°)");
+        telemetry.update();
         turnToHeading(338);
 
         // Launch artifacts
+        telemetry.addLine("Launching first set of artifacts");
+        telemetry.update();
         launchArtifacts();
 
         //turn back to 0
+        telemetry.addLine("Turning to 0°");
+        telemetry.update();
         turnToHeading(0);
 
         // go forward
+        telemetry.addLine("Moving forward (Y=21)");
+        telemetry.update();
         moveToYTarget(21);
 
         //turn to intake
+        telemetry.addLine("Turning to intake position (90°)");
+        telemetry.update();
         turnToHeading(90);
 
         //start intaking
+        telemetry.addLine("Starting intake sequence");
+        telemetry.update();
         intakeArtifacts(5000);
 
         //go forward to intake
+        telemetry.addLine("Moving to intake zone (Y=-32)");
+        telemetry.update();
         moveToYTarget(-32);
 
         //move backwards after intake
+        telemetry.addLine("Moving back from intake (Y=32)");
+        telemetry.update();
         moveToYTarget(32);
 
         //turn back to 0
+        telemetry.addLine("Turning back to 0°");
+        telemetry.update();
         turnToHeading(0);
 
         //move backwards to shooting zone
+        telemetry.addLine("Moving to second shooting position (Y=-21)");
+        telemetry.update();
         moveToYTarget(-21);
 
         //turn to shooting angle
+        telemetry.addLine("Turning to final shooting angle (338°)");
+        telemetry.update();
         turnToHeading(338);
 
         //launch artifacts
+        telemetry.addLine("Launching second set of artifacts");
+        telemetry.update();
         launchArtifacts();
 
+        telemetry.addLine("Autonomous sequence complete");
+        telemetry.update();
         drive.stop();
         shooter.stopShooting();
     }
@@ -124,10 +155,17 @@ public class AutoRedFar extends LinearOpMode {
 
             driveForward(drivePower);
 
+            telemetry.addData("Target Y", "%.2f", targetY);
+            telemetry.addData("Current Y", "%.2f", y);
+            telemetry.addData("Error", "%.2f", error);
+            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.update();
+
             if (Math.abs(error) < 0.5) break;
         }
         drive.stop();
-
+        telemetry.addLine("Y target reached");
+        telemetry.update();
     }
 
     private void turnToHeading(double targetHeading) {
@@ -162,17 +200,24 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void launchArtifacts() {
-        // Start shooter motors
+        telemetry.addLine("Starting shooter motors");
+        telemetry.update();
         shooter.startShootingFar();
         sleep(1000);
+        
+        telemetry.addLine("Starting artifact pusher wheel");
+        telemetry.update();
         artifactPusherArtifacts.startWheel();
         sleep(1000);
 
+        telemetry.addLine("Starting intake and pusher");
+        telemetry.update();
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
         sleep(1500);
 
-        // Stop shooter
+        telemetry.addLine("Stopping all launch mechanisms");
+        telemetry.update();
         shooter.stopShooting();
         intake.stopPushing();
         artifactPusherArtifacts.stopPushing();
@@ -182,9 +227,13 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void intakeArtifacts(long timeMs) {
+        telemetry.addData("Starting intake for", "%d ms", timeMs);
+        telemetry.update();
         intake.startPushing();
         sleep(timeMs);
         intake.stopPushing();
+        telemetry.addLine("Intake sequence completed");
+        telemetry.update();
     }
 
 
