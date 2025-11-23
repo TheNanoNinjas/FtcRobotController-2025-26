@@ -109,12 +109,12 @@ public class AutoRedFar extends LinearOpMode {
         //go forward to intake
         telemetry.addLine("Moving to intake zone (Y=-32)");
         telemetry.update();
-        moveToYTarget(-32);
+        moveToYTarget(32);
 
         //move backwards after intake
         telemetry.addLine("Moving back from intake (Y=32)");
         telemetry.update();
-        moveToYTarget(32);
+        moveToYTarget(-32);
 
         //turn back to 0
         telemetry.addLine("Turning back to 0°");
