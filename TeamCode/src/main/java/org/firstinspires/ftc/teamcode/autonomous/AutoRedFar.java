@@ -120,7 +120,7 @@ public class AutoRedFar extends LinearOpMode {
             double drivePower = 0.45;
             if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+            drivePower = Math.max(-0.5, Math.min(0.5, drivePower));
 
             driveForward(drivePower);
 

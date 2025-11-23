@@ -95,7 +95,7 @@ public class AutoBlueClose extends LinearOpMode {
         startX = odo.getPosition().getX(DistanceUnit.INCH);
         strafeToX(startX + 45, 0.3);
 
-        turnToHeading(225);
+        turnToHeading(0);
 
         launchArtifacts();
 
