@@ -18,6 +18,10 @@ import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 @Autonomous(name = "Auto Red Alliance Staged", group = "Competition")
 public class AutoRedStaged extends OpMode {
 
+    enum STATE  {
+        MOVE_TO_TARGET, TURN_TO_SHOOTING_ANGLE, LAUNCH_ARTIFACTS, TURN_TO_ZERO_STAGE, MOVE_TO_SECOND_TARGET, TURN_TO_270_STAGE, INTAKE_ARTIFACTS, MOVE_INTAKE_STAGE
+    }
+
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
