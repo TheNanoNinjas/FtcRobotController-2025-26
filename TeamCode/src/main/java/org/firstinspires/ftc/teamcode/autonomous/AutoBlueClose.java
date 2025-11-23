@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance", group = "Competition")
-public class AutoRed extends LinearOpMode {
+@Autonomous(name = "Auto Blue Alliance Close", group = "Competition")
+public class AutoBlueClose extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
@@ -26,11 +26,9 @@ public class AutoRed extends LinearOpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
-    private static final double TARGET_Y_INCHES = 10.0;
-    private static final double SECOND_TARGET_Y = 21;
-    private static final double INTAKE_TARGET_Y = -32;
-    private static final double MOVE_INTAKE_BACKWARDS_Y = -32;
-    private static final double MOVE_BACKWARDS_Y = -21;
+    private static final double TARGET_Y_INCHES = -60;
+    private static final double INTAKE_TARGET_Y = -21;
+    private static final double MOVE_INTAKE_FORWARDS_Y = 21;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -77,34 +75,125 @@ public class AutoRed extends LinearOpMode {
         // Move forward to target or until obstacle detected
         moveToTarget();
 
-        // Turn to shooting angle
-         turnToHeading(338);
+        //shoot
+        launchArtifacts();
 
-        // Launch artifacts
-       launchArtifacts();
+        //turn
+        turnToHeading(135);
 
-       turnToHeading(0);
-
-       moveToY();
-
-        turnToHeading(90);
+        //strafe to intake
+         double startX = odo.getPosition().getX(DistanceUnit.INCH);
+        strafeToX(startX - 45, 0.3); // strafe left
 
         intakeArtifacts(5000);
+
+        //go forward to intake artifacts
         moveToIntakeY();
+        //go back after intaking
+        moveForwardAfterIntake();
 
-        moveBackwardsIntake();
+        startX = odo.getPosition().getX(DistanceUnit.INCH);
+        strafeToX(startX + 45, 0.3);
 
-        turnToHeading(0);
-
-        moveBackwardsShoot();
-
-        turnToHeading(338);
+        turnToHeading(225);
 
         launchArtifacts();
 
         drive.stop();
         shooter.stopShooting();
     }
+
+
+    private void turnToHeading(double targetHeading) {
+        odo.update();
+        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+        double error = targetHeading - currentHeading;
+
+        // Normalize error to range -180 to +180
+        error = ((error + 180) % 360) - 180;
+
+        while (opModeIsActive() && Math.abs(error) > 1.0) {
+            odo.update();
+            currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+            error = targetHeading - currentHeading;
+            error = ((error + 180) % 360) - 180;
+
+            double turnPower = 0.3 * Math.signum(error);
+
+            // Turn using drive motors
+            robot.fl_motor.setPower(-turnPower);
+            robot.bl_motor.setPower(-turnPower);
+            robot.fr_motor.setPower(turnPower);
+            robot.br_motor.setPower(turnPower);
+
+            telemetry.addData("Target Heading", targetHeading);
+            telemetry.addData("Current Heading", currentHeading);
+            telemetry.addData("Error", error);
+            telemetry.update();
+        }
+
+        drive.stop();
+    }
+
+    private void strafeToX(double targetXInches, double basePower) {
+        odo.update();
+        Pose2D startPos = odo.getPosition();
+        double startHeading = startPos.getHeading(AngleUnit.DEGREES);
+
+        double currentX = startPos.getX(DistanceUnit.INCH);
+        double error = targetXInches - currentX;
+        double direction = Math.signum(error);
+
+        telemetry.addLine("Strafe Started");
+        telemetry.update();
+
+        while (opModeIsActive()) {
+            odo.update();
+            Pose2D pos = odo.getPosition();
+
+            currentX = pos.getX(DistanceUnit.INCH);
+            double currentHeading = pos.getHeading(AngleUnit.DEGREES);
+            error = targetXInches - currentX;
+
+            // Stop when close enough
+            if (Math.abs(error) < 0.5) break;
+
+            // Calculate heading error
+            double headingError = ((startHeading - currentHeading + 180) % 360) - 180;
+
+
+            double correction = 0.02 * headingError;  // tweak 0.02 if needed
+
+            // Base strafe power
+            double strafePower = direction * Math.abs(basePower);
+
+            // Apply heading correction to each side
+            double flPower = strafePower - correction;
+            double blPower = -strafePower - correction;
+            double frPower = -strafePower + correction;
+            double brPower = strafePower + correction;
+
+            robot.fl_motor.setPower(flPower);
+            robot.bl_motor.setPower(blPower);
+            robot.fr_motor.setPower(frPower);
+            robot.br_motor.setPower(brPower);
+
+            telemetry.addData("Target X (in)", targetXInches);
+            telemetry.addData("Current X (in)", currentX);
+            telemetry.addData("Remaining Distance (in)", "%.2f", error);
+            telemetry.addData("Heading", "%.2f", currentHeading);
+            telemetry.addData("Heading Error", "%.2f", headingError);
+            telemetry.addData("Correction", "%.2f", correction);
+            telemetry.update();
+
+            sleep(20);
+        }
+
+
+        telemetry.addLine("=== Strafe Completed ===");
+        telemetry.update();
+    }
+
 
     private void moveToTarget() {
         while (opModeIsActive()) {
@@ -153,52 +242,6 @@ public class AutoRed extends LinearOpMode {
         drive.stop();
     }
 
-    private void moveToY() {
-        while (opModeIsActive()) {
-            odo.update();
-            Pose2D pos = odo.getPosition();
-
-            double currentY = pos.getY(DistanceUnit.INCH);
-            double error = SECOND_TARGET_Y - currentY;
-            double drivePower = error * KP;
-            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
-
-            double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-
-            boolean targetReached = Math.abs(error) < 1.0;
-            boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-
-            if (targetReached || obstacleClose) {
-                drive.stop();
-                telemetry.addLine("Movement stopped!");
-
-                if (targetReached) {
-                    telemetry.addLine("Reason: Target reached");
-                }
-                if (obstacleClose) {
-                    telemetry.addLine("Reason: Obstacle detected");
-                    telemetry.addLine("Backing up...");
-                    telemetry.update();
-
-                    // Back up from obstacle
-                    driveBackward(0.25, 900);
-                }
-                telemetry.update();
-                break;
-            }
-
-
-            driveForward(drivePower);
-
-            telemetry.addData("Current Y (in)", "%.2f", currentY);
-            telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
-            telemetry.addData("Heading (deg)", pos.getHeading(AngleUnit.DEGREES));
-            telemetry.update();
-        }
-
-
-        drive.stop();
-    }
     private void moveToIntakeY() {
         while (opModeIsActive()) {
             odo.update();
@@ -245,15 +288,13 @@ public class AutoRed extends LinearOpMode {
 
         drive.stop();
     }
-
-
-    private void moveBackwardsIntake() {
+    private void moveForwardAfterIntake() {
         while (opModeIsActive()) {
             odo.update();
             Pose2D pos = odo.getPosition();
 
             double currentY = pos.getY(DistanceUnit.INCH);
-            double error = MOVE_INTAKE_BACKWARDS_Y - currentY;
+            double error = MOVE_INTAKE_FORWARDS_Y - currentY;
             double drivePower = error * KP;
             drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
 
@@ -293,82 +334,8 @@ public class AutoRed extends LinearOpMode {
 
         drive.stop();
     }
-    private void moveBackwardsShoot() {
-        while (opModeIsActive()) {
-            odo.update();
-            Pose2D pos = odo.getPosition();
-
-            double currentY = pos.getY(DistanceUnit.INCH);
-            double error = MOVE_BACKWARDS_Y - currentY;
-            double drivePower = error * KP;
-            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
-
-            double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-
-            boolean targetReached = Math.abs(error) < 1.0;
-            boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-
-            if (targetReached || obstacleClose) {
-                drive.stop();
-                telemetry.addLine("Movement stopped!");
-
-                if (targetReached) {
-                    telemetry.addLine("Reason: Target reached");
-                }
-                if (obstacleClose) {
-                    telemetry.addLine("Reason: Obstacle detected");
-                    telemetry.addLine("Backing up...");
-                    telemetry.update();
-
-                    // Back up from obstacle
-                    driveBackward(0.25, 900);
-                }
-                telemetry.update();
-                break;
-            }
 
 
-            driveForward(drivePower);
-
-            telemetry.addData("Current Y (in)", "%.2f", currentY);
-            telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
-            telemetry.addData("Heading (deg)", pos.getHeading(AngleUnit.DEGREES));
-            telemetry.update();
-        }
-
-
-        drive.stop();
-    }
-    private void turnToHeading(double targetHeading) {
-        odo.update();
-        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
-        double error = targetHeading - currentHeading;
-
-        // Normalize error to range -180 to +180
-        error = ((error + 180) % 360) - 180;
-
-        while (opModeIsActive() && Math.abs(error) > 1.0) {
-            odo.update();
-            currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
-            error = targetHeading - currentHeading;
-            error = ((error + 180) % 360) - 180;
-
-            double turnPower = 0.3 * Math.signum(error);
-
-            // Turn using drive motors
-            robot.fl_motor.setPower(-turnPower);
-            robot.bl_motor.setPower(-turnPower);
-            robot.fr_motor.setPower(turnPower);
-            robot.br_motor.setPower(turnPower);
-
-            telemetry.addData("Target Heading", targetHeading);
-            telemetry.addData("Current Heading", currentHeading);
-            telemetry.addData("Error", error);
-            telemetry.update();
-        }
-
-        drive.stop();
-    }
 
     private void launchArtifacts() {
         // Start shooter motors

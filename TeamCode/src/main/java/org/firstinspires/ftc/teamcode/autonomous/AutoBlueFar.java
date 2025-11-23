@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Blue Alliance", group = "Competition")
-public class AutoBlue extends LinearOpMode {
+@Autonomous(name = "Auto Blue Alliance Far", group = "Competition")
+public class AutoBlueFar extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
