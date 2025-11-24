@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance Staged", group = "Competition")
-public class AutoRedStaged extends OpMode {
+//@Autonomous(name = "Auto Red Alliance Staged", group = "Competition")
+public class AutoRedStagedPradeep extends OpMode {
 
     enum STATE  {
         MOVE_TO_TARGET, TURN_TO_SHOOTING_ANGLE, LAUNCH_ARTIFACTS, TURN_TO_ZERO_STAGE, MOVE_TO_SECOND_TARGET, TURN_TO_270_STAGE, INTAKE_ARTIFACTS, MOVE_INTAKE_STAGE
@@ -123,8 +123,15 @@ public class AutoRedStaged extends OpMode {
     }
 
     private void moveToTargetStage() {
+        // Reset odometry for this stage
+        if (stageTimer.seconds() < 0.1) {
+            odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        
         odo.update();
         Pose2D pos = odo.getPosition();
+        
         
         double currentY = pos.getY(DistanceUnit.INCH);
         double error = TARGET_Y_INCHES - currentY;
@@ -152,6 +159,12 @@ public class AutoRedStaged extends OpMode {
     }
     
     private void turnToShootingAngle() {
+        // Reset odometry for this stage
+        if (stageTimer.seconds() < 0.1) {
+            odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 338 - currentHeading;
@@ -193,6 +206,12 @@ public class AutoRedStaged extends OpMode {
     }
     
     private void turnToZeroStage() throws InterruptedException {
+        // Reset odometry for this stage
+        if (stageTimer.seconds() < 0.1) {
+            odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 0 - currentHeading;
@@ -215,6 +234,12 @@ public class AutoRedStaged extends OpMode {
     }
     
     private void moveToSecondTargetStage() {
+        // Reset odometry for this stage
+        if (stageTimer.seconds() < 0.1) {
+            odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        
         odo.update();
         Pose2D pos = odo.getPosition();
         
@@ -244,6 +269,12 @@ public class AutoRedStaged extends OpMode {
     }
     
     private void turnTo90Stage() {
+        // Reset odometry for this stage
+        if (stageTimer.seconds() < 0.1) {
+            odo.resetPosAndIMU();
+            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        }
+        
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 90 - currentHeading;
@@ -371,4 +402,11 @@ public class AutoRedStaged extends OpMode {
 
 
     }
+
+    private void resetOdometry(){
+        odo.resetPosAndIMU();
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+    }
+
+    
 }

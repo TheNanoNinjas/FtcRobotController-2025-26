@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -16,82 +17,71 @@ OpModeTest extends OpMode {
     Shooter shooter;
     Intaker intake;
     ArtifactPusher artifactPusher;
-    
+
     @Override
     public void init() {
         robot.init(hardwareMap);
-        
+
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
         intake = new Intaker(robot);
         artifactPusher = new ArtifactPusher(robot);
-        
+
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
     }
-    
+
     @Override
     public void init_loop() {
         telemetry.addData("Status", "Waiting for start...");
         telemetry.update();
     }
-    
+
     @Override
     public void start() {
         telemetry.addData("Status", "OpMode Started");
         telemetry.update();
     }
-    
+
     @Override
     public void loop() {
         handleDriving();
-        handleShooting();
         handleIntake();
         handlePush();
         launchArtifacts();
-        releaseArtifacts();
-        manualIntake();
-        
+
         telemetry.addData("Status", "Running");
         telemetry.update();
     }
-    
+
     @Override
     public void stop() {
         robot.stopAllMotors();
         telemetry.addData("Status", "Stopped");
         telemetry.update();
     }
-    
+
     private void handleDriving() {
         // Reset IMU heading with Cross button
         if (gamepad1.cross) {
             robot.imu.resetYaw();
         }
-        
+
         // Field-relative drive (default) or robot-relative (right bumper)
         if (gamepad1.right_bumper) {
             // Robot-relative drive
-            drive.mecanumDrive(-gamepad1.left_stick_y, 
-                              -gamepad1.left_stick_x, 
-                              -gamepad1.right_stick_x);
+            drive.mecanumDrive(-gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x);
         } else {
             // Field-relative drive
-            drive.driveFieldRelative(-gamepad1.left_stick_y, 
-                                    -gamepad1.left_stick_x, 
-                                    -gamepad1.right_stick_x, 
-                                    robot.imu);
+            drive.driveFieldRelative(-gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    robot.imu);
         }
     }
-    
-    private void handleShooting() {
-        if (gamepad2.right_bumper) {
-            shooter.startShootingFar();
-        } else {
-            shooter.stopShooting();
-        }
-    }
-    
+
     private void handleIntake() {
         if (gamepad1.left_bumper) {
             intake.startPushing();
@@ -99,25 +89,31 @@ OpModeTest extends OpMode {
             intake.stopPushing();
         }
     }
-    
-    private void manualIntake() {
-        if (gamepad2.square) {
-            shooter.manualIntakeShooter();
-        } else {
-            shooter.stopShooting();
-        }
-    }
-    
+
+
     private void handlePush() {
         if (gamepad2.cross) {
             artifactPusher.startWheel();
             intake.startPushing();
-        } else {
+        } else if (gamepad2.right_stick_button) {
+
+            intake.reversePush();
+            artifactPusher.reversePush();
+
+        }
+        else if(gamepad1.left_bumper){
+            intake.startPushing();
+
+
+        }
+
+
+        else {
             artifactPusher.stopPushing();
             intake.stopPushing();
         }
     }
-    
+
     private void launchArtifacts() {
         // Right bumper for close range shooting
         if (gamepad2.right_bumper) {
@@ -126,15 +122,14 @@ OpModeTest extends OpMode {
         // Left bumper for far range shooting
         else if (gamepad2.left_bumper) {
             shooter.startShootingFar();
+        } else if (gamepad2.square) {
+            shooter.manualIntakeShooter();
+
         } else {
             shooter.stopShooting();
         }
     }
-    
-    private void releaseArtifacts() {
-        if (gamepad2.right_stick_button) {
-            intake.reversePush();
-            artifactPusher.reversePush();
-        }
-    }
+
+
 }
+
