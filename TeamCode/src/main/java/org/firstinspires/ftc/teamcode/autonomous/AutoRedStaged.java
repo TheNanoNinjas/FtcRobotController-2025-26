@@ -32,8 +32,8 @@ public class AutoRedStaged extends OpMode {
     private Rev2mDistanceSensor distanceSensor;
 
     private static final double TARGET_Y_INCHES = 10.0;
-    private static final double SECOND_TARGET_Y = 21;
-    private static final double INTAKE_MOVE_Y = 32;
+    private static final double SECOND_TARGET_Y = 28;
+    private static final double INTAKE_MOVE_Y = 27;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -84,16 +84,16 @@ public class AutoRedStaged extends OpMode {
             case 5:
                 moveToSecondTargetStage();
                 break;
-          /*  case 6:
-                //turnTo270Stage();
+             case 6:
+                turnTo90Stage();
                 break;
             case 7:
-                //intakeArtifactsStage();
+                intakeArtifactsStage();
                 break;
             case 8:
-                //moveIntakeStage();
+                moveIntakeStage();
                 break;
-          */  default:
+            default:
                 drive.stop();
                 shooter.stopShooting();
                 intake.stopPushing();
@@ -243,10 +243,10 @@ public class AutoRedStaged extends OpMode {
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
     
-    private void turnTo270Stage() {
+    private void turnTo90Stage() {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
-        double error = 270 - currentHeading;
+        double error = 90 - currentHeading;
         error = ((error + 180) % 360) - 180;
         
         if (Math.abs(error) <= 1.0) {
@@ -265,7 +265,8 @@ public class AutoRedStaged extends OpMode {
     }
     
     private void intakeArtifactsStage() {
-        if (stageTimer.seconds() < 5.0) {
+
+        if (stageTimer.seconds() < 0.0) {
             intake.startPushing();
         } else {
             intake.stopPushing();
@@ -289,7 +290,7 @@ public class AutoRedStaged extends OpMode {
         
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-        
+
         if (targetReached || obstacleClose) {
             drive.stop();
             if (obstacleClose) {
@@ -297,11 +298,14 @@ public class AutoRedStaged extends OpMode {
             }
             STAGE = 9; // Complete
         } else {
-            driveForward(drivePower);
+            driveBackward(drivePower);
+            intake.startPushing();
         }
         
         telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+        telemetry.addData("Error ", "%.2f", error);
+        //telemetry.addData("Error ", "%.2f", error);
     }
 
 
@@ -319,5 +323,14 @@ public class AutoRedStaged extends OpMode {
         robot.br_motor.setPower(-power);
         try { Thread.sleep(timeMs); } catch (InterruptedException e) {}
         drive.stop();
+    }
+
+    private void driveBackward(double power) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+
+
     }
 }
