@@ -33,7 +33,7 @@ public class AutoRedStaged extends OpMode {
 
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 28;
-    private static final double INTAKE_MOVE_Y = 27;
+    private static final double INTAKE_MOVE_Y = 35;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -301,11 +301,49 @@ public class AutoRedStaged extends OpMode {
             driveBackward(drivePower);
             intake.startPushing();
         }
-        
+
+
+
+
+
+
+
+
+
+
         telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
         telemetry.addData("Error ", "%.2f", error);
         //telemetry.addData("Error ", "%.2f", error);
+    }
+
+    public void afterIntakingMovement(){
+        odo.update();
+        Pose2D pos = odo.getPosition();
+
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = SECOND_TARGET_Y - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            STAGE = 6;
+            stageTimer.reset();
+        } else {
+            driveForward(drivePower);
+        }
+
+        telemetry.addData("Second Target Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
 
 
