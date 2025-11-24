@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-@Autonomous(name = "Auto Red Staged Trial Run", group = "Competition")
-public class AutoRedStagedTrial extends OpMode {
+@Autonomous(name = "Auto Red Staged Avi", group = "Competition")
+public class AutoRedStagedAvi extends OpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
