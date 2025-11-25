@@ -33,8 +33,8 @@ public class AutoRedStaged extends OpMode {
 
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 28;
-    private static final double INTAKE_MOVE_Y = 5.0;
-    private static final double SECOND_INTAKE_MOVE_Y = 28;
+    private static final double INTAKE_MOVE_Y = 43;
+    private static final double SECOND_INTAKE_MOVE_Y = 43;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -60,7 +60,7 @@ public class AutoRedStaged extends OpMode {
     public void start() {
         stageTimer.reset();
         resetOdometry();
-        STAGE = 7;
+        STAGE = 1;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class AutoRedStaged extends OpMode {
                 afterIntakingMovement();
                 break;
             case 9:
-                afterIntakingMovement();
+                //afterIntakingMovement();
                 break;
             default:
                 drive.stop();
@@ -298,8 +298,8 @@ public class AutoRedStaged extends OpMode {
 
         
         double currentY = pos.getY(DistanceUnit.INCH);
-        double error =   INTAKE_MOVE_Y - currentY;
-        double drivePower = error * KP;
+        double error =   INTAKE_MOVE_Y - Math.abs(currentY);
+        double drivePower = error * 0.09;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
         
         double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
@@ -313,7 +313,7 @@ public class AutoRedStaged extends OpMode {
                 driveBackward(0.25, 900);
             }
             resetOdometry();
-            STAGE = -1; // Complete
+            STAGE = 8; // Complete
 
         } else {
             driveBackward(drivePower);
@@ -333,7 +333,7 @@ public class AutoRedStaged extends OpMode {
         Pose2D pos = odo.getPosition();
 
         double currentY = pos.getY(DistanceUnit.INCH);
-        double error = SECOND_INTAKE_MOVE_Y - currentY;
+        double error =    SECOND_INTAKE_MOVE_Y - Math.abs(currentY);
         double drivePower = error * KP;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
 
@@ -349,7 +349,7 @@ public class AutoRedStaged extends OpMode {
             }
             STAGE = 9; // Complete
         } else {
-            driveBackward(drivePower);
+            driveForward(Math.abs(drivePower));
             intake.startPushing();
         }
 
