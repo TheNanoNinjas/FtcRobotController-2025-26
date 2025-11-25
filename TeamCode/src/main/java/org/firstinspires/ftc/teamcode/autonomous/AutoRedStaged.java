@@ -33,7 +33,8 @@ public class AutoRedStaged extends OpMode {
 
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 28;
-    private static final double INTAKE_MOVE_Y = 35;
+    private static final double INTAKE_MOVE_Y = 10;
+    private static final double SECOND_INTAKE_MOVE_Y = 28;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -49,6 +50,7 @@ public class AutoRedStaged extends OpMode {
         intake = new Intaker(robot);
         
         initializeSensors();
+        resetOdometry();
         
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -57,7 +59,8 @@ public class AutoRedStaged extends OpMode {
     @Override
     public void start() {
         stageTimer.reset();
-        STAGE = 1;
+        resetOdometry();
+        STAGE = 7;
     }
 
     @Override
@@ -88,10 +91,15 @@ public class AutoRedStaged extends OpMode {
                 turnTo90Stage();
                 break;
             case 7:
-                intakeArtifactsStage();
+                //intakeArtifactsStage();
+                moveIntakeStage();
                 break;
             case 8:
-                moveIntakeStage();
+               // moveIntakeStage();
+                afterIntakingMovement();
+                break;
+            case 9:
+                afterIntakingMovement();
                 break;
             default:
                 drive.stop();
@@ -253,6 +261,7 @@ public class AutoRedStaged extends OpMode {
             drive.stop();
             STAGE = 7;
             stageTimer.reset();
+            resetOdometry();
         } else {
             double turnPower = 0.2 * Math.signum(error);
             robot.fl_motor.setPower(-turnPower);
@@ -261,7 +270,7 @@ public class AutoRedStaged extends OpMode {
             robot.br_motor.setPower(turnPower);
         }
         
-        telemetry.addData("Turn to 270 Heading", currentHeading);
+        telemetry.addData("Turn to 90 Heading", currentHeading);
     }
     
     private void intakeArtifactsStage() {
@@ -280,14 +289,50 @@ public class AutoRedStaged extends OpMode {
     private void moveIntakeStage() {
         odo.update();
         Pose2D pos = odo.getPosition();
+
         
         double currentY = pos.getY(DistanceUnit.INCH);
-        double error = INTAKE_MOVE_Y - currentY;
+        double error =   INTAKE_MOVE_Y - currentY;
         double drivePower = error * KP;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
         
         double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
         
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            resetOdometry();
+            STAGE = -1; // Complete
+
+        } else {
+            driveBackward(drivePower);
+            intake.startPushing();
+        }
+
+        telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+        telemetry.addData("Error ", "%.2f", error);
+        telemetry.addData("Drive Power ", "%.2f", drivePower);
+
+        //telemetry.addData("Error ", "%.2f", error);
+    }
+
+    public void afterIntakingMovement(){
+        odo.update();
+        Pose2D pos = odo.getPosition();
+
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = SECOND_INTAKE_MOVE_Y - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
 
@@ -302,47 +347,7 @@ public class AutoRedStaged extends OpMode {
             intake.startPushing();
         }
 
-
-
-
-
-
-
-
-
-
-        telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
-        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
-        telemetry.addData("Error ", "%.2f", error);
-        //telemetry.addData("Error ", "%.2f", error);
-    }
-
-    public void afterIntakingMovement(){
-        odo.update();
-        Pose2D pos = odo.getPosition();
-
-        double currentY = pos.getY(DistanceUnit.INCH);
-        double error = SECOND_TARGET_Y - currentY;
-        double drivePower = error * KP;
-        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
-
-        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-
-        boolean targetReached = Math.abs(error) < 1.0;
-        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-
-        if (targetReached || obstacleClose) {
-            drive.stop();
-            if (obstacleClose) {
-                driveBackward(0.25, 900);
-            }
-            STAGE = 6;
-            stageTimer.reset();
-        } else {
-            driveForward(drivePower);
-        }
-
-        telemetry.addData("Second Target Y (in)", "%.2f", currentY);
+        telemetry.addData("After Intaking Target Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
 
@@ -370,5 +375,11 @@ public class AutoRedStaged extends OpMode {
         robot.br_motor.setPower(-power);
 
 
+    }
+
+
+    private void resetOdometry(){
+        odo.resetPosAndIMU();
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
     }
 }
