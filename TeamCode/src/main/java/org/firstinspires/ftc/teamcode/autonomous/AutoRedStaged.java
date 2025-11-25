@@ -126,8 +126,14 @@ public class AutoRedStaged extends OpMode {
         odo.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
+    }
+    
+    private void resetOdometry() {
         odo.resetPosAndIMU();
+        try { Thread.sleep(50); } catch (InterruptedException e) {}
         odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        try { Thread.sleep(50); } catch (InterruptedException e) {}
+        odo.update();
     }
 
     private void moveToTargetStage() {
@@ -379,7 +385,11 @@ public class AutoRedStaged extends OpMode {
 
 
     private void resetOdometry(){
-        odo.resetPosAndIMU();
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        odo.resetPosAndIMU();           // Reset hardware
+        Thread.sleep(50);               // Wait for processing
+        odo.setPosition(new Pose2D(...)); // Set new origin
+        Thread.sleep(50);               // Wait for processing  
+        odo.update();   
+
     }
 }
