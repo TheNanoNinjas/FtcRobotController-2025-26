@@ -5,17 +5,22 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
-import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
-import org.firstinspires.ftc.teamcode.util.RobotHardware;
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
+import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Staged Avi", group = "Competition")
+@Autonomous(name = "Auto Red Alliance Avi Staged", group = "Competition")
 public class AutoRedStagedAvi extends OpMode {
+
+    enum STATE  {
+        MOVE_TO_TARGET, TURN_TO_SHOOTING_ANGLE, LAUNCH_ARTIFACTS, TURN_TO_ZERO_STAGE, MOVE_TO_SECOND_TARGET, TURN_TO_270_STAGE, INTAKE_ARTIFACTS, MOVE_INTAKE_STAGE
+    }
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
@@ -26,6 +31,10 @@ public class AutoRedStagedAvi extends OpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
+    private static final double TARGET_Y_INCHES = 10.0;
+    private static final double SECOND_TARGET_Y = 28;
+    private static final double INTAKE_MOVE_Y = 43;
+    private static final double SECOND_INTAKE_MOVE_Y = 43;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
 
@@ -39,9 +48,10 @@ public class AutoRedStagedAvi extends OpMode {
         shooter = new Shooter(robot);
         artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
-        
+
         initializeSensors();
-        
+        resetOdometry();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -49,6 +59,7 @@ public class AutoRedStagedAvi extends OpMode {
     @Override
     public void start() {
         stageTimer.reset();
+        resetOdometry();
         STAGE = 1;
     }
 
@@ -56,42 +67,46 @@ public class AutoRedStagedAvi extends OpMode {
     public void loop() {
         switch (STAGE) {
             case 1:
-                moveToTargetStage(10, 2);
-                break;
+                moveToTargetStage(10,2);
 
+                break;
             case 2:
-                turnToHeadingStage(338, 3);
-                break;
+                turnToHeadingStage(338,3);
 
+                break;
             case 3:
                 launchArtifactsStage();
-                break;
 
+                break;
             case 4:
-                turnToHeadingStage(0, 5);
-                break;
+                turnToHeadingStage(0,5);
 
+                break;
             case 5:
-                moveToTargetStage(25, 6);
-                break;
+                moveToTargetStage(28,6);
 
+                break;
             case 6:
-                turnToHeadingStage(90, 7);
+                turnToHeadingStage(90,7);
+
                 break;
             case 7:
-            moveToTargetStage(-32,8);
+                intakeArtifactsStage();
+
                 break;
             case 8:
-                  intakeArtifactsStage();
+                moveToTargetStage(-43,9);
+
                 break;
             case 9:
-                moveToTargetStage(32,10);
+                moveToTargetStage(43,10);
+
                 break;
             case 10:
-                turnToHeadingStage(0, 11);
+                turnToHeadingStage(0,11);
                 break;
             case 11:
-                moveToTargetStage(-27,12);
+                moveToTargetStage(-28,12);
                 break;
             case 12:
                 turnToHeadingStage(338,13);
@@ -112,7 +127,6 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.update();
     }
 
-
     private void initializeSensors() {
         // Distance sensor
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
@@ -126,8 +140,14 @@ public class AutoRedStagedAvi extends OpMode {
         odo.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
+    }
+
+    private void resetOdometry() {
         odo.resetPosAndIMU();
+        try { Thread.sleep(50); } catch (InterruptedException e) {}
         odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        try { Thread.sleep(50); } catch (InterruptedException e) {}
+        odo.update();
     }
 
     private void moveToTargetStage(double targetY, int nextStage) {
@@ -185,6 +205,7 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.addData("Turn Error", error);
     }
 
+
     private void launchArtifactsStage() {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
@@ -200,20 +221,22 @@ public class AutoRedStagedAvi extends OpMode {
             STAGE = 4;
             stageTimer.reset();
         }
-        
+
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
 
-    
+
+
     private void intakeArtifactsStage() {
-        if (stageTimer.seconds() < 5.0) {
+
+        if (stageTimer.seconds() < 0.0) {
             intake.startPushing();
         } else {
             intake.stopPushing();
             STAGE = 8;
             stageTimer.reset();
         }
-        
+
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
 
@@ -233,4 +256,29 @@ public class AutoRedStagedAvi extends OpMode {
         try { Thread.sleep(timeMs); } catch (InterruptedException e) {}
         drive.stop();
     }
+
+    private void driveBackward(double power) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+
+
+    }
+
+
+//    private void resetOdometry(){
+//              // Reset hardware
+//        try {
+//            odo.resetPosAndIMU();
+//            Thread.sleep(50);
+//            odo.setPosition(new Pose2D(...)); // Set new origin
+//            Thread.sleep(50);               // Wait for processing
+//            odo.update();  // Wait for processing
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//
+//    }
 }
