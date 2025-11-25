@@ -95,11 +95,10 @@ public class AutoRedStaged extends OpMode {
                 moveIntakeStage();
                 break;
             case 8:
-               // moveIntakeStage();
-                afterIntakingMovement();
+                intakeForOneSecondStage();
                 break;
             case 9:
-                //afterIntakingMovement();
+                 afterIntakingMovement();
                 break;
             default:
                 drive.stop();
@@ -312,9 +311,8 @@ public class AutoRedStaged extends OpMode {
             if (obstacleClose) {
                 driveBackward(0.25, 900);
             }
-            resetOdometry();
-            STAGE = 8; // Complete
-
+            STAGE = 8;
+            stageTimer.reset();
         } else {
             driveBackward(drivePower);
             intake.startPushing();
@@ -328,6 +326,18 @@ public class AutoRedStaged extends OpMode {
         //telemetry.addData("Error ", "%.2f", error);
     }
 
+    private void intakeForOneSecondStage() {
+        if (stageTimer.seconds() < 1.0) {
+            intake.startPushing();
+        } else {
+            intake.stopPushing();
+            STAGE = 9;
+            stageTimer.reset();
+        }
+        
+        telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
+    }
+    
     public void afterIntakingMovement(){
         odo.update();
         Pose2D pos = odo.getPosition();
@@ -347,7 +357,7 @@ public class AutoRedStaged extends OpMode {
             if (obstacleClose) {
                 driveBackward(0.25, 900);
             }
-            STAGE = 9; // Complete
+            STAGE = 10; // Complete
         } else {
             driveForward(Math.abs(drivePower));
             intake.startPushing();
@@ -384,18 +394,5 @@ public class AutoRedStaged extends OpMode {
     }
 
 
-//    private void resetOdometry(){
-//              // Reset hardware
-//        try {
-//            odo.resetPosAndIMU();
-//            Thread.sleep(50);
-//            odo.setPosition(new Pose2D(...)); // Set new origin
-//            Thread.sleep(50);               // Wait for processing
-//            odo.update();  // Wait for processing
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//
-//    }
+
 }
