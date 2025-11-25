@@ -33,7 +33,7 @@ public class AutoRedStaged extends OpMode {
 
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 28;
-    private static final double INTAKE_MOVE_Y = 10;
+    private static final double INTAKE_MOVE_Y = 5.0;
     private static final double SECOND_INTAKE_MOVE_Y = 28;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
@@ -384,12 +384,18 @@ public class AutoRedStaged extends OpMode {
     }
 
 
-    private void resetOdometry(){
-        odo.resetPosAndIMU();           // Reset hardware
-        Thread.sleep(50);               // Wait for processing
-        odo.setPosition(new Pose2D(...)); // Set new origin
-        Thread.sleep(50);               // Wait for processing  
-        odo.update();   
-
-    }
+//    private void resetOdometry(){
+//              // Reset hardware
+//        try {
+//            odo.resetPosAndIMU();
+//            Thread.sleep(50);
+//            odo.setPosition(new Pose2D(...)); // Set new origin
+//            Thread.sleep(50);               // Wait for processing
+//            odo.update();  // Wait for processing
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//
+//    }
 }
