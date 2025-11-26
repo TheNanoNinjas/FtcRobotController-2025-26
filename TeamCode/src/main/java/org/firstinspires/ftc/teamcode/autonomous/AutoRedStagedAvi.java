@@ -90,7 +90,7 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 7:
-                intakeArtifactsStage();
+                startIntake(8);
 
                 break;
             case 8:
@@ -98,22 +98,26 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 9:
-                moveToTargetStage(24,10);
+             stopIntake(10);
 
                 break;
             case 10:
-                turnToHeadingStage(0,11);
+                moveToTargetStage(24,11);
 
                 break;
             case 11:
-                moveToTargetStage(-28,12);
+                turnToHeadingStage(0,11);
 
                 break;
             case 12:
-                turnToHeadingStage(338,13);
+                moveToTargetStage(-28,13);
 
                 break;
             case 13:
+                turnToHeadingStage(338,14);
+
+                break;
+            case 14:
                 launchArtifactsStage();
 
                 break;
@@ -247,14 +251,16 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
 
-    private void intakeArtifactsStage() {
-        if (stageTimer.seconds() < 0.0) {
-            intake.startPushing();
-        } else {
-            intake.stopPushing();
-            STAGE = 8;
-            stageTimer.reset();
-        }
+    private void startIntake(int nextStage) {
+        intake.startPushing();
+        STAGE = nextStage;
+
+        telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
+    }
+
+    private void stopIntake(int nextStage) {
+        intake.stopPushing();
+        STAGE = nextStage;
 
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
