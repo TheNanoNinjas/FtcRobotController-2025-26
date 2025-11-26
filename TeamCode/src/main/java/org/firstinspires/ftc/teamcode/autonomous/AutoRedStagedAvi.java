@@ -74,19 +74,19 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 3:
-                launchArtifactsStage();
+                launchArtifactsStage(4);
 
                 break;
             case 4:
-                turnToHeadingStage(0,5);
+                turnToHeadingStage(18,5);
 
                 break;
             case 5:
-                moveToTargetStage(28,6);
+                moveToTargetStage(24,6);
 
                 break;
             case 6:
-                turnToHeadingStage(90,7);
+                turnToHeadingStage(93,7);
 
                 break;
             case 7:
@@ -94,7 +94,7 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 8:
-                moveToTargetStage(-24,9);
+               moveToTargetStage(-24,9);
 
                 break;
             case 9:
@@ -102,11 +102,11 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 10:
-                moveToTargetStage(24,11);
+                moveToTargetStage(50,11);
 
                 break;
             case 11:
-                turnToHeadingStage(0,11);
+                turnToHeadingStage(0,12);
 
                 break;
             case 12:
@@ -118,7 +118,7 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 14:
-                launchArtifactsStage();
+                launchArtifactsStage(15);
 
                 break;
 
@@ -186,7 +186,34 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
 
+    private void moveToTargetStageReverse(double targetY, int nextStage) {
+        odo.update();
+        Pose2D pos = odo.getPosition();
 
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = targetY - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            STAGE = nextStage;
+            stageTimer.reset();
+        } else {
+            driveBackward(drivePower);
+        }
+
+        telemetry.addData("Current Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+    }
     private void turnToHeadingStage(double targetHeading, int nextStage) {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
@@ -213,7 +240,7 @@ public class AutoRedStagedAvi extends OpMode {
     }
 
 
-    private void launchArtifactsStage() {
+    private void launchArtifactsStage(int nextStage) {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
         } else if (stageTimer.seconds() < 2.0) {
@@ -225,7 +252,7 @@ public class AutoRedStagedAvi extends OpMode {
             shooter.stopShooting();
             intake.stopPushing();
             artifactPusherArtifacts.stopPushing();
-            STAGE = 4;
+            STAGE = nextStage;
             stageTimer.reset();
         }
 
@@ -283,6 +310,8 @@ public class AutoRedStagedAvi extends OpMode {
         drive.stop();
     }
 
+
+
     private void driveBackward(double power) {
         robot.fl_motor.setPower(-power);
         robot.fr_motor.setPower(-power);
@@ -291,8 +320,6 @@ public class AutoRedStagedAvi extends OpMode {
 
 
     }
-
-
 //    private void resetOdometry(){
 //              // Reset hardware
 //        try {
