@@ -27,7 +27,6 @@ public class AutoRedStagedAvi extends OpMode {
     private Shooter shooter;
     private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
-
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
@@ -95,24 +94,28 @@ public class AutoRedStagedAvi extends OpMode {
 
                 break;
             case 8:
-                moveToTargetStage(-43,9);
+                moveToTargetStage(-24,9);
 
                 break;
             case 9:
-                moveToTargetStage(43,10);
+                moveToTargetStage(24,10);
 
                 break;
             case 10:
                 turnToHeadingStage(0,11);
+
                 break;
             case 11:
                 moveToTargetStage(-28,12);
+
                 break;
             case 12:
                 turnToHeadingStage(338,13);
+
                 break;
             case 13:
                 launchArtifactsStage();
+
                 break;
 
             default:
@@ -225,15 +228,13 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
 
-
-
     private void intakeArtifactsStage() {
 
         if (stageTimer.seconds() < 0.0) {
             intake.startPushing();
         } else {
             intake.stopPushing();
-            STAGE = 8;
+            STAGE = 7;
             stageTimer.reset();
         }
 
