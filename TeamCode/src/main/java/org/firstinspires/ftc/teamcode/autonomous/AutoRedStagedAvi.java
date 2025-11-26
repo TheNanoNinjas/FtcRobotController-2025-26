@@ -229,17 +229,17 @@ public class AutoRedStagedAvi extends OpMode {
     }
 
     private void intakeArtifactsStage() {
-
-        if (stageTimer.seconds() < 0.0) {
+        if (stageTimer.seconds() < 4.0) {
             intake.startPushing();
         } else {
             intake.stopPushing();
-            STAGE = 7;
+            STAGE = 8;
             stageTimer.reset();
         }
 
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
+
 
 
     private void driveForward(double power) {
