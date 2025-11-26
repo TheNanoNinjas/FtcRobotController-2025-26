@@ -59,7 +59,7 @@ public class AutoRedStagedAvi extends OpMode {
     public void start() {
         stageTimer.reset();
         resetOdometry();
-        STAGE = 1;
+        STAGE = 8;
     }
 
     @Override
@@ -162,7 +162,7 @@ public class AutoRedStagedAvi extends OpMode {
         Pose2D pos = odo.getPosition();
 
         double currentY = pos.getY(DistanceUnit.INCH);
-        double error = targetY - currentY;
+        double error = targetY - Math.abs(currentY);
         double drivePower = error * KP;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
 
@@ -178,12 +178,14 @@ public class AutoRedStagedAvi extends OpMode {
             }
             STAGE = nextStage;
             stageTimer.reset();
+            resetOdometry();
         } else {
             driveForward(drivePower);
         }
 
         telemetry.addData("Current Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+        telemetry.addData("Error Value", "%.2f", error);
     }
 
     private void moveToTargetStageReverse(double targetY, int nextStage) {
@@ -207,6 +209,7 @@ public class AutoRedStagedAvi extends OpMode {
             }
             STAGE = nextStage;
             stageTimer.reset();
+            resetOdometry();
         } else {
             driveBackward(drivePower);
         }
@@ -226,8 +229,9 @@ public class AutoRedStagedAvi extends OpMode {
             drive.stop();
             STAGE = nextStage;
             stageTimer.reset();
+            resetOdometry();
         } else {
-            double turnPower = 0.2 * Math.signum(error);  // same as before
+            double turnPower = 0.5 * Math.signum(error);  // same as before
             robot.fl_motor.setPower(-turnPower);
             robot.bl_motor.setPower(-turnPower);
             robot.fr_motor.setPower(turnPower);
@@ -254,6 +258,7 @@ public class AutoRedStagedAvi extends OpMode {
             artifactPusherArtifacts.stopPushing();
             STAGE = nextStage;
             stageTimer.reset();
+            resetOdometry();
         }
 
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
@@ -281,14 +286,16 @@ public class AutoRedStagedAvi extends OpMode {
     private void startIntake(int nextStage) {
         intake.startPushing();
         STAGE = nextStage;
-
+        stageTimer.reset();
+        resetOdometry();
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
 
     private void stopIntake(int nextStage) {
         intake.stopPushing();
         STAGE = nextStage;
-
+        stageTimer.reset();
+        resetOdometry();
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
 
