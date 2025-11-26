@@ -228,8 +228,27 @@ public class AutoRedStagedAvi extends OpMode {
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
 
+    private void launchArtifactsStageFinal() {
+        if (stageTimer.seconds() < 1.0) {
+            shooter.startShootingFar();
+        } else if (stageTimer.seconds() < 2.0) {
+            artifactPusherArtifacts.startWheel();
+        } else if (stageTimer.seconds() < 4.0) {
+            intake.startPushing();
+            artifactPusherArtifacts.startWheel();
+        } else {
+            shooter.stopShooting();
+            intake.stopPushing();
+            artifactPusherArtifacts.stopPushing();
+            STAGE =14;
+            stageTimer.reset();
+        }
+
+        telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
+    }
+
     private void intakeArtifactsStage() {
-        if (stageTimer.seconds() < 4.0) {
+        if (stageTimer.seconds() < 0.0) {
             intake.startPushing();
         } else {
             intake.stopPushing();
