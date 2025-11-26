@@ -99,8 +99,15 @@ public class AutoRedStaged extends OpMode {
                 afterIntakingMovement();
                 break;
             case 9:
-                //afterIntakingMovement();
+                try {
+                    secondTurnToZeroStage();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
+
+            case 10:
+                moveToThirdTargetStage();
             default:
                 drive.stop();
                 shooter.stopShooting();
@@ -211,7 +218,7 @@ public class AutoRedStaged extends OpMode {
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 0 - currentHeading;
         error = ((error + 180) % 360) - 180;
-        
+
         if (Math.abs(error) <= 1.0) {
             Thread.sleep(100);
             drive.stop();
@@ -224,24 +231,24 @@ public class AutoRedStaged extends OpMode {
             robot.fr_motor.setPower(turnPower);
             robot.br_motor.setPower(turnPower);
         }
-        
+
         telemetry.addData("Turn to 0 Heading", currentHeading);
     }
-    
+
     private void moveToSecondTargetStage() {
         odo.update();
         Pose2D pos = odo.getPosition();
-        
+
         double currentY = pos.getY(DistanceUnit.INCH);
         double error = SECOND_TARGET_Y - currentY;
         double drivePower = error * KP;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
-        
+
         double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-        
+
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-        
+
         if (targetReached || obstacleClose) {
             drive.stop();
             if (obstacleClose) {
@@ -252,17 +259,17 @@ public class AutoRedStaged extends OpMode {
         } else {
             driveForward(drivePower);
         }
-        
+
         telemetry.addData("Second Target Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
-    
+
     private void turnTo90Stage() {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 90 - currentHeading;
         error = ((error + 180) % 360) - 180;
-        
+
         if (Math.abs(error) <= 1.0) {
             drive.stop();
             STAGE = 7;
@@ -275,10 +282,10 @@ public class AutoRedStaged extends OpMode {
             robot.fr_motor.setPower(turnPower);
             robot.br_motor.setPower(turnPower);
         }
-        
+
         telemetry.addData("Turn to 90 Heading", currentHeading);
     }
-    
+
     private void intakeArtifactsStage() {
 
         if (stageTimer.seconds() < 0.0) {
@@ -288,22 +295,22 @@ public class AutoRedStaged extends OpMode {
             STAGE = 8;
             stageTimer.reset();
         }
-        
+
         telemetry.addData("Intake Timer", "%.1f", stageTimer.seconds());
     }
-    
+
     private void moveIntakeStage() {
         odo.update();
         Pose2D pos = odo.getPosition();
 
-        
+
         double currentY = pos.getY(DistanceUnit.INCH);
         double error =   INTAKE_MOVE_Y - Math.abs(currentY);
         double drivePower = error * 0.09;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
-        
+
         double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-        
+
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
 
@@ -354,6 +361,59 @@ public class AutoRedStaged extends OpMode {
         }
 
         telemetry.addData("After Intaking Target Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+    }
+    private void secondTurnToZeroStage() throws InterruptedException {
+        odo.update();
+        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+        double error =    currentHeading -90;
+       // error = ((error + 180) % 360) - 180;
+        Thread.sleep(100);
+        if (error <= -145) {
+            Thread.sleep(100);
+            drive.stop();
+            STAGE = -1;
+            stageTimer.reset();
+        } else {
+            double turnPower = 0.5 * Math.signum(error);
+            robot.fl_motor.setPower(-turnPower);
+            robot.bl_motor.setPower(-turnPower);
+            robot.fr_motor.setPower(turnPower);
+            robot.br_motor.setPower(turnPower);
+        }
+
+        telemetry.addData("Error ", "%.2f", error);
+        telemetry.addData("currentHeading",  "%.2f", currentHeading);
+        telemetry.addData("Error ", "%.2f", error);
+    }
+
+
+    private void moveToThirdTargetStage() {
+        odo.update();
+        Pose2D pos = odo.getPosition();
+
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double error = SECOND_TARGET_Y - currentY;
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+
+        boolean targetReached = Math.abs(error) < 1.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+        if (targetReached || obstacleClose) {
+            drive.stop();
+            if (obstacleClose) {
+                driveBackward(0.25, 900);
+            }
+            STAGE = 11;
+            stageTimer.reset();
+        } else {
+            driveBackward(drivePower);
+        }
+
+        telemetry.addData("Second Target Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
 
