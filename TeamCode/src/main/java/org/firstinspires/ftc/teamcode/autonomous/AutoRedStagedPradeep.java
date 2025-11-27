@@ -408,5 +408,40 @@ public class AutoRedStagedPradeep extends OpMode {
         odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
     }
 
+    private void turnToHeadingStage(double targetHeading, int nextStage) {
+        odo.update();
+        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+
+        double error = targetHeading - currentHeading;
+        error = ((error + 180) % 360) - 180;
+
+        if (Math.abs(error) <= 2.0) {
+            drive.stop();
+            STAGE = nextStage;
+            stageTimer.reset();
+            resetOdometry();
+        } else {
+            // Smooth power control based on error magnitude
+            double turnPower;
+            if (Math.abs(error) > 30) {
+                turnPower = 0.25 * Math.signum(error);  // Reduced max power
+            } else if (Math.abs(error) > 10) {
+                turnPower = 0.15 * Math.signum(error);  // Medium power
+            } else {
+                turnPower = 0.1 * Math.signum(error);   // Low power for precision
+            }
+            
+            robot.fl_motor.setPower(-turnPower);
+            robot.bl_motor.setPower(-turnPower);
+            robot.fr_motor.setPower(turnPower);
+            robot.br_motor.setPower(turnPower);
+        }
+
+        telemetry.addData("Target Heading", targetHeading);
+        telemetry.addData("Current Heading", currentHeading);
+        telemetry.addData("Turn Error", error);
+    }
+
+
     
 }
