@@ -39,6 +39,8 @@ public class AutoRedStagedPradeep extends OpMode {
 
     private static int STAGE = 1;
     private ElapsedTime stageTimer = new ElapsedTime();
+    private double remainingTurnAngle = 0;
+    private boolean turnInitialized = false;
 
     @Override
     public void init() {
@@ -409,30 +411,40 @@ public class AutoRedStagedPradeep extends OpMode {
     }
 
     private void turnToHeadingStage(double targetHeading, int nextStage) {
-        if (Math.abs(targetHeading) <= 2.0) {
+        // Initialize turn on first call
+        if (!turnInitialized) {
+            remainingTurnAngle = targetHeading;
+            turnInitialized = true;
+        }
+        
+        if (Math.abs(remainingTurnAngle) <= 2.0) {
             drive.stop();
+            turnInitialized = false;
             STAGE = nextStage;
             stageTimer.reset();
             resetOdometry();
         } else {
             // Direct turn control: positive = right, negative = left
             double turnPower;
-            if (Math.abs(targetHeading) > 30) {
-                turnPower = 0.4 * Math.signum(targetHeading);   // Higher max power
-            } else if (Math.abs(targetHeading) > 10) {
-                turnPower = 0.25 * Math.signum(targetHeading);  // Medium power
+            if (Math.abs(remainingTurnAngle) > 30) {
+                turnPower = 0.4 * Math.signum(remainingTurnAngle);
+            } else if (Math.abs(remainingTurnAngle) > 10) {
+                turnPower = 0.25 * Math.signum(remainingTurnAngle);
             } else {
-                turnPower = 0.15 * Math.signum(targetHeading);  // Low power for precision
+                turnPower = 0.15 * Math.signum(remainingTurnAngle);
             }
             
             robot.fl_motor.setPower(-turnPower);
             robot.bl_motor.setPower(-turnPower);
             robot.fr_motor.setPower(turnPower);
             robot.br_motor.setPower(turnPower);
+            
+            // Reduce remaining angle (approximate)
+            remainingTurnAngle -= turnPower * 2.0; // Adjust factor as needed
         }
 
-        telemetry.addData("Target Heading", targetHeading);
-        telemetry.addData("Turn Power", Math.signum(targetHeading) * 0.4);
+        telemetry.addData("Remaining Turn Angle", remainingTurnAngle);
+        telemetry.addData("Turn Power", Math.signum(remainingTurnAngle) * 0.4);
     }
 
 
