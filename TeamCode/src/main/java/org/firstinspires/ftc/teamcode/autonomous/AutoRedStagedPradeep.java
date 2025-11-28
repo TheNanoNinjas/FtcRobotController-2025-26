@@ -409,26 +409,20 @@ public class AutoRedStagedPradeep extends OpMode {
     }
 
     private void turnToHeadingStage(double targetHeading, int nextStage) {
-        odo.update();
-        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
-
-        double error = targetHeading - currentHeading;
-        error = ((error + 180) % 360) - 180;
-
-        if (Math.abs(error) <= 2.0) {
+        if (Math.abs(targetHeading) <= 2.0) {
             drive.stop();
             STAGE = nextStage;
             stageTimer.reset();
             resetOdometry();
         } else {
-            // Smooth power control based on error magnitude
+            // Direct turn control: positive = right, negative = left
             double turnPower;
-            if (Math.abs(error) > 30) {
-                turnPower = 0.25 * Math.signum(error);  // Reduced max power
-            } else if (Math.abs(error) > 10) {
-                turnPower = 0.15 * Math.signum(error);  // Medium power
+            if (Math.abs(targetHeading) > 30) {
+                turnPower = 0.4 * Math.signum(targetHeading);   // Higher max power
+            } else if (Math.abs(targetHeading) > 10) {
+                turnPower = 0.25 * Math.signum(targetHeading);  // Medium power
             } else {
-                turnPower = 0.1 * Math.signum(error);   // Low power for precision
+                turnPower = 0.15 * Math.signum(targetHeading);  // Low power for precision
             }
             
             robot.fl_motor.setPower(-turnPower);
@@ -438,8 +432,7 @@ public class AutoRedStagedPradeep extends OpMode {
         }
 
         telemetry.addData("Target Heading", targetHeading);
-        telemetry.addData("Current Heading", currentHeading);
-        telemetry.addData("Turn Error", error);
+        telemetry.addData("Turn Power", Math.signum(targetHeading) * 0.4);
     }
 
 
