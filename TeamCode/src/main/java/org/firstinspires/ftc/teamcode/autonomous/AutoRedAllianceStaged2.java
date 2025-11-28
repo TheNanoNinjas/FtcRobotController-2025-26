@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
+
 @Autonomous(name = "Auto Red Alliance Staged 2", group = "Competition")
 public class AutoRedAllianceStaged2 extends OpMode {
 
@@ -25,9 +26,15 @@ public class AutoRedAllianceStaged2 extends OpMode {
         LAUNCH_ARTIFACTS,
         TURN_TO_ZERO_STAGE,
         MOVE_TO_SECOND_TARGET,
-        TURN_TO_270_STAGE,
+        TURN_TO_90_STAGE,
         INTAKE_ARTIFACTS,
         MOVE_INTAKE_STAGE,
+        STOP_INTAKE,
+        TURN_TO_ZERO,
+        MOVE_BACK_TO_SHOOT,
+        TURN_TO_SHOOTING_ANGLE2,
+        SHOOT_ARTIFACTS,
+        MOVE_AFTER_INTAKE,
         STOP
     }
 
@@ -44,25 +51,18 @@ public class AutoRedAllianceStaged2 extends OpMode {
     private static final double TURN_TOLERANCE_DEG = 2.0;
 
     private STAGE currentStage = STAGE.IDLE;
-    private int nextStageIndex = 1; // for compatibility with integer stage values if desired
     private ElapsedTime stageTimer = new ElapsedTime();
-
-    // Stage parameters (example values copied and cleaned up from your original)
-    private static final double FIRST_MOVE_Y = 10.0;     // inches
-    private static final double SECOND_MOVE_Y = 24.0;    // inches
-    private static final double INTAKE_MOVE_Y = 43.0;    // inches
 
     @Override
     public void init() {
         robot.init(hardwareMap);
+
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
         artifactPusher = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
         initializeSensors();
-
-        // Reset odometry and IMU once at init so headings start at 0 when robot faces forward
         resetOdometryAtStart();
 
         telemetry.addData("Status", "Initialized");
@@ -74,11 +74,8 @@ public class AutoRedAllianceStaged2 extends OpMode {
     @Override
     public void start() {
         stageTimer.reset();
-        // Start the run sequence: stage numbers chosen to mirror your original flow
         currentStage = STAGE.MOVE_TO_TARGET;
-        nextStageIndex = 2;
 
-        // Make sure odometry has a stable reading at the start of auto
         resetOdometryAtStart();
     }
 
@@ -87,11 +84,11 @@ public class AutoRedAllianceStaged2 extends OpMode {
         try {
             switch (currentStage) {
                 case MOVE_TO_TARGET:
-                    moveToTargetStage(FIRST_MOVE_Y, STAGE.TURN_TO_SHOOTING_ANGLE);
+                    moveToTargetStage(10, STAGE.TURN_TO_SHOOTING_ANGLE);
                     break;
 
                 case TURN_TO_SHOOTING_ANGLE:
-                    turnToHeadingStage(-45, STAGE.LAUNCH_ARTIFACTS);
+                    turnToHeadingStage(338, STAGE.LAUNCH_ARTIFACTS);
                     break;
 
                 case LAUNCH_ARTIFACTS:
@@ -99,15 +96,15 @@ public class AutoRedAllianceStaged2 extends OpMode {
                     break;
 
                 case TURN_TO_ZERO_STAGE:
-                    turnToHeadingStage(18, STAGE.MOVE_TO_SECOND_TARGET);
+                    turnToHeadingStage(0, STAGE.MOVE_TO_SECOND_TARGET);
                     break;
 
                 case MOVE_TO_SECOND_TARGET:
-                    moveToTargetStage(SECOND_MOVE_Y, STAGE.TURN_TO_270_STAGE);
+                    moveToTargetStage(24, STAGE.TURN_TO_90_STAGE);
                     break;
 
-                case TURN_TO_270_STAGE:
-                    turnToHeadingStage(93, STAGE.INTAKE_ARTIFACTS);
+                case TURN_TO_90_STAGE:
+                    turnToHeadingStage(90, STAGE.INTAKE_ARTIFACTS);
                     break;
 
                 case INTAKE_ARTIFACTS:
@@ -115,7 +112,31 @@ public class AutoRedAllianceStaged2 extends OpMode {
                     break;
 
                 case MOVE_INTAKE_STAGE:
-                    moveToTargetStage(-24, STAGE.STOP);
+                    moveBackwardsToTargetStage(-24, STAGE.MOVE_AFTER_INTAKE);
+                    break;
+
+                case MOVE_AFTER_INTAKE:
+                    moveToTargetStage(24, STAGE.STOP_INTAKE);
+                    break;
+
+                case STOP_INTAKE:
+                    stopIntake(STAGE.TURN_TO_ZERO);
+                    break;
+
+                case TURN_TO_ZERO:
+                    turnToHeadingStage(0, STAGE.MOVE_BACK_TO_SHOOT);
+                    break;
+
+                case MOVE_BACK_TO_SHOOT:
+                    moveToTargetStage(-24, STAGE.TURN_TO_SHOOTING_ANGLE2);
+                    break;
+
+                case TURN_TO_SHOOTING_ANGLE2:
+                    turnToHeadingStage(338, STAGE.SHOOT_ARTIFACTS);
+                    break;
+
+                case SHOOT_ARTIFACTS:
+                    launchArtifactsStage(STAGE.STOP);
                     break;
 
                 case STOP:
@@ -126,6 +147,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
                     artifactPusher.stopPushing();
                     break;
             }
+
         } catch (Exception e) {
             telemetry.addData("Exception", e.getMessage());
         }
@@ -134,13 +156,12 @@ public class AutoRedAllianceStaged2 extends OpMode {
         telemetry.update();
     }
 
-    // ----------------- Helpers and Stage Implementations -----------------
 
     private void initializeSensors() {
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        // Set offsets and directions according to your hardware. Keep heading "forward = 0".
+
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(
@@ -148,27 +169,24 @@ public class AutoRedAllianceStaged2 extends OpMode {
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
     }
 
-    /**
-     * Use this only at the *start* of autonomous to zero position/heading.
-     * Do NOT call this after turns — resetting the IMU will zero the heading and break relative turns.
-     */
     private void resetOdometryAtStart() {
         odo.resetPosAndIMU();
-        try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+        sleep(50);
         odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
-        try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+        sleep(50);
         odo.update();
+    }
+
+    private void sleep(long ms) {
+        try { Thread.sleep(ms); } catch (Exception ignored) {}
     }
 
     private double angleError(double targetDeg, double currentDeg) {
         double error = targetDeg - currentDeg;
-        // Normalize to [-180,180)
-        error = ((error + 180.0) % 360.0 + 360.0) % 360.0 - 180.0;
-        return error;
+        return ((error + 180) % 360 + 360) % 360 - 180;
     }
 
     private void turnToHeadingStage(double targetHeading, STAGE nextStage) {
-        // Update odometry to read fresh heading
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = angleError(targetHeading, currentHeading);
@@ -181,12 +199,12 @@ public class AutoRedAllianceStaged2 extends OpMode {
             drive.stop();
             currentStage = nextStage;
             stageTimer.reset();
-            // Do NOT reset odometry here — keeps heading continuity for next actions
             return;
         }
 
         double turnPower;
         double absError = Math.abs(error);
+
         if (absError > 30) turnPower = 0.40;
         else if (absError > 10) turnPower = 0.25;
         else turnPower = 0.15;
@@ -204,76 +222,136 @@ public class AutoRedAllianceStaged2 extends OpMode {
         Pose2D pos = odo.getPosition();
 
         double currentY = pos.getY(DistanceUnit.INCH);
-        // Allowing negative/positive movements — targetY can be negative for reverse
+
         double error = targetY - currentY;
 
-        double drivePower = error * KP;
-        drivePower = Math.max(-0.6, Math.min(0.6, drivePower));
+        double drivePower = Math.max(-0.35, Math.min(0.35, error * KP));
 
         double distanceInches;
         try {
             distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
         } catch (Exception e) {
-            distanceInches = Double.POSITIVE_INFINITY; // sensor failure: ignore obstacle
+            distanceInches = Double.POSITIVE_INFINITY;
+        }
+
+        boolean targetReached = Math.abs(error) < 2.0;
+        boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
+
+        if (targetReached || obstacleClose) {
+            drive.stop();
+
+            if (obstacleClose) driveBackward(0.25, 300);
+
+            currentStage = nextStage;
+            stageTimer.reset();
+
+            // Reset Y but keep heading
+            odo.setPosition(new Pose2D(
+                    DistanceUnit.INCH, 0, 0,
+                    AngleUnit.DEGREES,
+                    odo.getPosition().getHeading(AngleUnit.DEGREES)
+            ));
+            odo.update();
+            return;
+        }
+
+        if (drivePower >= 0) driveForward(drivePower);
+        else driveBackward(-drivePower);
+
+        telemetry.addData("Current Y", currentY);
+        telemetry.addData("Error", error);
+        telemetry.addData("Drive Power", drivePower);
+        telemetry.addData("Distance Sensor", distanceInches);
+    }
+
+    private void moveBackwardsToTargetStage(double targetY, STAGE nextStage) {
+        odo.update();
+        Pose2D pos = odo.getPosition();
+
+        double currentY = pos.getY(DistanceUnit.INCH);
+
+        // Correct backward error calculation
+        double error = targetY - currentY;   // targetY MUST be negative for backwards
+
+        // Proportional backwards power
+        double drivePower = error * KP;
+        drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+        double distanceInches;
+        try {
+            distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+        } catch (Exception e) {
+            distanceInches = Double.POSITIVE_INFINITY;
         }
 
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
 
-        telemetry.addData("Current Y (in)", "%.2f", currentY);
-        telemetry.addData("Error Y (in)", "%.2f", error);
-        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
-
         if (targetReached || obstacleClose) {
             drive.stop();
+
             if (obstacleClose) {
-                // back away a small amount safely (blocking short wait)
                 driveBackward(0.25, 300);
             }
+
             currentStage = nextStage;
             stageTimer.reset();
-            // Reset position origin for the next straight movement if desired but don't reset heading
-            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, odo.getPosition().getHeading(AngleUnit.DEGREES)));
+
+            // reset Y origin only
+            odo.setPosition(new Pose2D(
+                    DistanceUnit.INCH,
+                    0, 0,
+                    AngleUnit.DEGREES,
+                    pos.getHeading(AngleUnit.DEGREES)
+            ));
             odo.update();
+
             return;
         }
 
-        // Drive forward/backward based on sign of drivePower
-        if (drivePower >= 0) {
-            driveForward(drivePower);
-        } else {
-            driveBackward(Math.abs(drivePower));
-        }
+        // --- Drive backwards ---
+        driveBackward(Math.abs(drivePower));
+        intake.startPushing();
+
+        telemetry.addData("CurrentY", currentY);
+        telemetry.addData("TargetY", targetY);
+        telemetry.addData("Error", error);
+        telemetry.addData("DrivePower", drivePower);
+        telemetry.addData("DistanceSensor", distanceInches);
     }
+
 
     private void launchArtifactsStage(STAGE nextStage) {
         double t = stageTimer.seconds();
-        if (t < 1.0) {
-            shooter.startShootingFar();
-        } else if (t < 2.0) {
-            artifactPusher.startWheel();
-        } else if (t < 4.0) {
+
+        if (t < 1.0) shooter.startShootingFar();
+        else if (t < 2.0) artifactPusher.startWheel();
+        else if (t < 4.0) {
             intake.startPushing();
             artifactPusher.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();
             artifactPusher.stopPushing();
+
             currentStage = nextStage;
             stageTimer.reset();
-            // keep odometry heading, but we can zero Y if desired for next move:
-            odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, odo.getPosition().getHeading(AngleUnit.DEGREES)));
+
+            odo.setPosition(new Pose2D(
+                    DistanceUnit.INCH, 0, 0,
+                    AngleUnit.DEGREES,
+                    odo.getPosition().getHeading(AngleUnit.DEGREES)
+            ));
             odo.update();
         }
 
-        telemetry.addData("Launch Timer", "%.1f", t);
+        telemetry.addData("Launch Timer", t);
     }
 
     private void startIntake(STAGE nextStage) {
         intake.startPushing();
         currentStage = nextStage;
         stageTimer.reset();
-        // Keep heading consistent
     }
 
     private void stopIntake(STAGE nextStage) {
@@ -282,7 +360,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
         stageTimer.reset();
     }
 
-    // Basic drive helpers
+
     private void driveForward(double power) {
         robot.fl_motor.setPower(power);
         robot.fr_motor.setPower(power);
@@ -292,7 +370,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
 
     private void driveBackward(double power, long timeMs) {
         driveBackward(power);
-        try { Thread.sleep(timeMs); } catch (InterruptedException ignored) {}
+        sleep(timeMs);
         drive.stop();
     }
 
