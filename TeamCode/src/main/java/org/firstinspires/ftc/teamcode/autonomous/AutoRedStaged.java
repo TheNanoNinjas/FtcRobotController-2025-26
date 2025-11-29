@@ -48,10 +48,10 @@ public class AutoRedStaged extends OpMode {
         shooter = new Shooter(robot);
         artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
-        
+
         initializeSensors();
         resetOdometry();
-        
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -74,7 +74,7 @@ public class AutoRedStaged extends OpMode {
                 break;
             case 3:
 
-               launchArtifactsStage();
+                launchArtifactsStage();
                 break;
             case 4:
 
@@ -87,7 +87,7 @@ public class AutoRedStaged extends OpMode {
             case 5:
                 moveToSecondTargetStage();
                 break;
-             case 6:
+            case 6:
                 turnTo90Stage();
                 break;
             case 7:
@@ -95,7 +95,7 @@ public class AutoRedStaged extends OpMode {
                 moveIntakeStage();
                 break;
             case 8:
-               // moveIntakeStage();
+                // moveIntakeStage();
                 afterIntakingMovement();
                 break;
             case 9:
@@ -115,7 +115,7 @@ public class AutoRedStaged extends OpMode {
                 artifactPusherArtifacts.stopPushing();
                 break;
         }
-        
+
         telemetry.addData("Current Stage", STAGE);
         telemetry.update();
     }
@@ -134,7 +134,7 @@ public class AutoRedStaged extends OpMode {
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
     }
-    
+
     private void resetOdometry() {
         odo.resetPosAndIMU();
         try { Thread.sleep(50); } catch (InterruptedException e) {}
@@ -146,17 +146,17 @@ public class AutoRedStaged extends OpMode {
     private void moveToTargetStage() {
         odo.update();
         Pose2D pos = odo.getPosition();
-        
+
         double currentY = pos.getY(DistanceUnit.INCH);
         double error = TARGET_Y_INCHES - currentY;
         double drivePower = error * KP;
         drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
-        
+
         double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-        
+
         boolean targetReached = Math.abs(error) < 1.0;
         boolean obstacleClose = distanceInches < OBSTACLE_DISTANCE;
-        
+
         if (targetReached || obstacleClose) {
             drive.stop();
             if (obstacleClose) {
@@ -167,17 +167,17 @@ public class AutoRedStaged extends OpMode {
         } else {
             driveForward(drivePower);
         }
-        
+
         telemetry.addData("Current Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
     }
-    
+
     private void turnToShootingAngle() {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = 338 - currentHeading;
         error = ((error + 180) % 360) - 180;
-        
+
         if (Math.abs(error) <= 1.0) {
             drive.stop();
             STAGE = 3;
@@ -189,11 +189,11 @@ public class AutoRedStaged extends OpMode {
             robot.fr_motor.setPower(turnPower);
             robot.br_motor.setPower(turnPower);
         }
-        
+
         telemetry.addData("Target Heading", 338);
         telemetry.addData("Current Heading", currentHeading);
     }
-    
+
     private void launchArtifactsStage() {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
@@ -209,10 +209,10 @@ public class AutoRedStaged extends OpMode {
             STAGE = 4;
             stageTimer.reset();
         }
-        
+
         telemetry.addData("Launch Timer", "%.1f", stageTimer.seconds());
     }
-    
+
     private void turnToZeroStage() throws InterruptedException {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
@@ -367,7 +367,7 @@ public class AutoRedStaged extends OpMode {
         odo.update();
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error =    currentHeading -90;
-       // error = ((error + 180) % 360) - 180;
+        // error = ((error + 180) % 360) - 180;
         Thread.sleep(100);
         if (error <= -145) {
             Thread.sleep(100);

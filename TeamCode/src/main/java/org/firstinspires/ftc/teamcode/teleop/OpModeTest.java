@@ -104,7 +104,6 @@ OpModeTest extends OpMode {
         else if(gamepad1.left_bumper){
             intake.startPushing();
 
-
         }
 
 
@@ -129,7 +128,6 @@ OpModeTest extends OpMode {
             shooter.stopShooting();
         }
     }
-
 
 }
 

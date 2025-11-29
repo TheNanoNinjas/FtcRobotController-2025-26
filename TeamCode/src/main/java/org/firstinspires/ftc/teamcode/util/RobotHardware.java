@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.autonomous.GoBildaPinpointDriver;
+
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
@@ -20,6 +23,7 @@ public class RobotHardware {
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
 
+    private GoBildaPinpointDriver odo;
 
     // Sensors
     public IMU imu;
@@ -43,14 +47,15 @@ public class RobotHardware {
         // Set shooter direction
         leftShooter.setDirection(DcMotor.Direction.REVERSE);
 
-
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+
     }
+
 
     public void setDrivePower(double fl, double fr, double bl, double br) {
         fl_motor.setPower(fl);

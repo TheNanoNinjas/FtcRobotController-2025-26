@@ -87,25 +87,25 @@ public class AutoRedFar extends LinearOpMode {
         moveToYTarget(24);
 
         //turn to intake
-        turnToHeading(90);
+        turnToHeading(95);
 
         //start intaking
         startIntake();
 
         //go forward to intake
-        moveBackwardsToYTarget(35);
+        moveBackwardsToYTarget(27);
 
         sleep(500);
         //move backwards after intake
-        driveForwardtimed(0.3, 1000);
+        driveForwardtimed(0.3, 1500);
 
         stopIntake();
 
         //turn back to 0
-        turnToHeading(5);
+        turnToHeading(0);
 
         //move backwards to shooting zone
-        driveBackwardTimed(0.3, 2000);
+        driveBackwardTimed(0.3, 1750);
         sleep(1000);
 
         driveForwardtimed(0.3, 400);
@@ -114,6 +114,10 @@ public class AutoRedFar extends LinearOpMode {
 
         //launch artifacts
         launchArtifacts();
+
+        odo.update();
+        // double startX = odo.getPosition().getX(DistanceUnit.INCH);
+        //strafeToX(startX + 5.0, 0.3); // strafe right
 
         driveForwardtimed(0.2, 3000);
 
@@ -245,10 +249,10 @@ public class AutoRedFar extends LinearOpMode {
             double frPower = -strafePower + correction;
             double brPower = strafePower + correction;
 
-            robot.fl_motor.setPower(flPower);
+            robot.fl_motor.setPower(-flPower);
             robot.bl_motor.setPower(blPower);
             robot.fr_motor.setPower(frPower);
-            robot.br_motor.setPower(brPower);
+            robot.br_motor.setPower(-brPower);
 
             telemetry.addData("Target X (in)", targetXInches);
             telemetry.addData("Current X (in)", currentX);

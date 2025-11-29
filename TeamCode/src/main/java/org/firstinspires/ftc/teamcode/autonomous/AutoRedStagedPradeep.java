@@ -335,15 +335,6 @@ public class AutoRedStagedPradeep extends OpMode {
             intake.startPushing();
         }
 
-
-
-
-
-
-
-
-
-
         telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
         telemetry.addData("Error ", "%.2f", error);
