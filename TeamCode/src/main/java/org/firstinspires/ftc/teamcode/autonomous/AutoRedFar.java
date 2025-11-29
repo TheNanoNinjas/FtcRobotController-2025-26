@@ -26,7 +26,7 @@ public class AutoRedFar extends LinearOpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
-    private static final double KP = 0.10;
+    private static final double KP = 0.05;
 
     @Override
     public void runOpMode() {
@@ -74,8 +74,7 @@ public class AutoRedFar extends LinearOpMode {
         moveToYTarget(6);
 
         // Turn to shooting angle
-
-        turnToHeading(350);
+        turnToHeading(346);
 
         // Launch artifacts
         launchArtifacts();
@@ -93,11 +92,11 @@ public class AutoRedFar extends LinearOpMode {
         startIntake();
 
         //go forward to intake
-        moveBackwardsToYTarget(27);
+        moveBackwardsToYTarget(30);
 
-        sleep(500);
+        sleep(750);
         //move backwards after intake
-        driveForwardtimed(0.3, 1500);
+        driveForwardtimed(0.2, 1500);
 
         stopIntake();
 
@@ -105,12 +104,12 @@ public class AutoRedFar extends LinearOpMode {
         turnToHeading(0);
 
         //move backwards to shooting zone
-        driveBackwardTimed(0.3, 1750);
+        driveBackwardTimed(0.2, 1600);
         sleep(1000);
 
-        driveForwardtimed(0.3, 400);
+        driveForwardtimed(0.2, 400);
         //turn to shooting angle
-        turnToHeading(350);
+        turnToHeading(346);
 
         //launch artifacts
         launchArtifacts();
@@ -134,10 +133,10 @@ public class AutoRedFar extends LinearOpMode {
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
 
-            double drivePower = 0.3;
+            double drivePower = 0.25;
             if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
 
             driveForward(drivePower);
 
@@ -160,10 +159,10 @@ public class AutoRedFar extends LinearOpMode {
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
 
-            double drivePower = 0.3;
+            double drivePower = 0.25;
             if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
 
             driveBackward(drivePower);
 
@@ -194,7 +193,7 @@ public class AutoRedFar extends LinearOpMode {
             error = targetHeading - currentHeading;
             error = ((error + 180) % 360) - 180;
 
-            double turnPower = 0.3 * Math.signum(error);
+            double turnPower = 0.25 * Math.signum(error);
 
             // Turn using drive motors
             robot.fl_motor.setPower(-turnPower);
