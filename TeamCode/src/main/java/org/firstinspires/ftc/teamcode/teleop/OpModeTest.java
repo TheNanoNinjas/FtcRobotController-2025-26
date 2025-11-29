@@ -76,7 +76,7 @@ OpModeTest extends OpMode {
 
         updateOdoMetrics();
         telemetry.addData("Status", "Running");
-        telemetry.update();
+       // telemetry.update();
     }
 
     private void updateOdoMetrics() {
