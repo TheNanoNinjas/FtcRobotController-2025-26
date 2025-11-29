@@ -76,7 +76,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
         stageTimer.reset();
         currentStage = STAGE.MOVE_TO_TARGET;
 
-        resetOdometryAtStart();
+       // resetOdometryAtStart();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
                     break;
 
                 case MOVE_TO_SECOND_TARGET:
-                    moveToTargetStage(24, STAGE.TURN_TO_90_STAGE);
+                    moveToTargetStage(19, STAGE.TURN_TO_90_STAGE);
                     break;
 
                 case TURN_TO_90_STAGE:
@@ -112,11 +112,11 @@ public class AutoRedAllianceStaged2 extends OpMode {
                     break;
 
                 case MOVE_INTAKE_STAGE:
-                    moveBackwardsToTargetStage(-24, STAGE.MOVE_AFTER_INTAKE);
+                    moveBackwardsToTargetStage(1, STAGE.MOVE_AFTER_INTAKE);
                     break;
 
                 case MOVE_AFTER_INTAKE:
-                    moveToTargetStage(24, STAGE.STOP_INTAKE);
+                    moveBackwardsToTargetStage(5, STAGE.STOP_INTAKE);
                     break;
 
                 case STOP_INTAKE:
@@ -161,12 +161,13 @@ public class AutoRedAllianceStaged2 extends OpMode {
         distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
     }
 
     private void resetOdometryAtStart() {
@@ -271,7 +272,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
         double currentY = pos.getY(DistanceUnit.INCH);
 
         // Correct backward error calculation
-        double error = targetY - currentY;   // targetY MUST be negative for backwards
+        double error = targetY - currentY;
 
         // Proportional backwards power
         double drivePower = error * KP;
@@ -372,6 +373,17 @@ public class AutoRedAllianceStaged2 extends OpMode {
         driveBackward(power);
         sleep(timeMs);
         drive.stop();
+    }
+    private void driveBackwardTimed(double power, long ms, STAGE nextStage) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+        sleep(ms);
+        currentStage = nextStage;
+        stageTimer.reset();
+
+        robot.stopAllMotors();
     }
 
     private void driveBackward(double power) {

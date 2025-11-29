@@ -56,8 +56,6 @@ public class AutoRedFar extends LinearOpMode {
 
         // Odometry setup
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        //change the offsets to however far our odometry pods are from the dead center of the robot
-        //x offset is for the side to side one, y offset is for the forward back one
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(
@@ -70,76 +68,60 @@ public class AutoRedFar extends LinearOpMode {
     private void executeAutonomousSequence() {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
-        
+
         // Move forward to shooting position
-        telemetry.addLine("Moving to shooting position (Y=10)");
-        telemetry.update();
-        moveToYTarget(10);
+
+        moveToYTarget(6);
 
         // Turn to shooting angle
-        telemetry.addLine("Turning to shooting angle (338°)");
-        telemetry.update();
-        turnToHeading(338);
+
+        turnToHeading(350);
 
         // Launch artifacts
-        telemetry.addLine("Launching first set of artifacts");
-        telemetry.update();
         launchArtifacts();
 
         //turn back to 0
-        telemetry.addLine("Turning to 0°");
-        telemetry.update();
         turnToHeading(0);
 
         // go forward
-        telemetry.addLine("Moving forward (Y=21)");
-        telemetry.update();
-        moveToYTarget(21);
+        moveToYTarget(24);
 
         //turn to intake
-        telemetry.addLine("Turning to intake position (90°)");
-        telemetry.update();
         turnToHeading(90);
 
         //start intaking
-        telemetry.addLine("Starting intake sequence");
-        telemetry.update();
-        intakeArtifacts(5000);
+        startIntake();
 
         //go forward to intake
-        telemetry.addLine("Moving to intake zone (Y=-32)");
-        telemetry.update();
-        moveToYTarget(32);
+        moveBackwardsToYTarget(35);
 
+        sleep(500);
         //move backwards after intake
-        telemetry.addLine("Moving back from intake (Y=32)");
-        telemetry.update();
-        moveToYTarget(-32);
+        driveForwardtimed(0.3, 1000);
+
+        stopIntake();
 
         //turn back to 0
-        telemetry.addLine("Turning back to 0°");
-        telemetry.update();
-        turnToHeading(0);
+        turnToHeading(5);
 
         //move backwards to shooting zone
-        telemetry.addLine("Moving to second shooting position (Y=-21)");
-        telemetry.update();
-        moveToYTarget(-21);
+        driveBackwardTimed(0.3, 2000);
+        sleep(1000);
 
+        driveForwardtimed(0.3, 400);
         //turn to shooting angle
-        telemetry.addLine("Turning to final shooting angle (338°)");
-        telemetry.update();
-        turnToHeading(338);
+        turnToHeading(350);
 
         //launch artifacts
-        telemetry.addLine("Launching second set of artifacts");
-        telemetry.update();
         launchArtifacts();
+
+        driveForwardtimed(0.2, 3000);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
         drive.stop();
         shooter.stopShooting();
+        intake.stopPushing();
     }
 
     private void moveToYTarget(double targetY) {
@@ -148,12 +130,38 @@ public class AutoRedFar extends LinearOpMode {
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
 
-            double drivePower = 0.45;
+            double drivePower = 0.3;
             if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            drivePower = Math.max(-0.5, Math.min(0.5, drivePower));
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
 
             driveForward(drivePower);
+
+            telemetry.addData("Target Y", "%.2f", targetY);
+            telemetry.addData("Current Y", "%.2f", y);
+            telemetry.addData("Error", "%.2f", error);
+            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.update();
+
+            if (Math.abs(error) < 0.5) break;
+        }
+        drive.stop();
+        telemetry.addLine("Y target reached");
+        telemetry.update();
+    }
+
+    private void moveBackwardsToYTarget(double targetY) {
+        while (opModeIsActive()) {
+            odo.update();
+            double y = odo.getPosition().getY(DistanceUnit.INCH);
+            double error = targetY - y;
+
+            double drivePower = 0.3;
+            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
+
+            drivePower = Math.max(-0.4, Math.min(0.4, drivePower));
+
+            driveBackward(drivePower);
 
             telemetry.addData("Target Y", "%.2f", targetY);
             telemetry.addData("Current Y", "%.2f", y);
@@ -199,12 +207,71 @@ public class AutoRedFar extends LinearOpMode {
         drive.stop();
     }
 
+    private void strafeToX(double targetXInches, double basePower) {
+        odo.update();
+        Pose2D startPos = odo.getPosition();
+        double startHeading = startPos.getHeading(AngleUnit.DEGREES);
+
+        double currentX = startPos.getX(DistanceUnit.INCH);
+        double error = targetXInches - currentX;
+        double direction = Math.signum(error);
+
+        telemetry.addLine("Strafe Started");
+        telemetry.update();
+
+        while (opModeIsActive()) {
+            odo.update();
+            Pose2D pos = odo.getPosition();
+
+            currentX = pos.getX(DistanceUnit.INCH);
+            double currentHeading = pos.getHeading(AngleUnit.DEGREES);
+            error = targetXInches - currentX;
+
+            // Stop when close enough
+            if (Math.abs(error) < 0.5) break;
+
+            // Calculate heading error
+            double headingError = ((startHeading - currentHeading + 180) % 360) - 180;
+
+
+            double correction = 0.02 * headingError;  // tweak 0.02 if needed
+
+            // Base strafe power
+            double strafePower = direction * Math.abs(basePower);
+
+            // Apply heading correction to each side
+            double flPower = strafePower - correction;
+            double blPower = -strafePower - correction;
+            double frPower = -strafePower + correction;
+            double brPower = strafePower + correction;
+
+            robot.fl_motor.setPower(flPower);
+            robot.bl_motor.setPower(blPower);
+            robot.fr_motor.setPower(frPower);
+            robot.br_motor.setPower(brPower);
+
+            telemetry.addData("Target X (in)", targetXInches);
+            telemetry.addData("Current X (in)", currentX);
+            telemetry.addData("Remaining Distance (in)", "%.2f", error);
+            telemetry.addData("Heading", "%.2f", currentHeading);
+            telemetry.addData("Heading Error", "%.2f", headingError);
+            telemetry.addData("Correction", "%.2f", correction);
+            telemetry.update();
+
+            sleep(20);
+        }
+
+        robot.stopAllMotors();
+        telemetry.addLine("Strafe Completed");
+        telemetry.update();
+    }
+
     private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
         shooter.startShootingFar();
         sleep(1000);
-        
+
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
         artifactPusherArtifacts.startWheel();
@@ -226,16 +293,14 @@ public class AutoRedFar extends LinearOpMode {
         telemetry.update();
     }
 
-    private void intakeArtifacts(long timeMs) {
-        telemetry.addData("Starting intake for", "%d ms", timeMs);
-        telemetry.update();
+    private void startIntake() {
         intake.startPushing();
-        sleep(timeMs);
-        intake.stopPushing();
-        telemetry.addLine("Intake sequence completed");
-        telemetry.update();
     }
 
+    private void stopIntake() {
+        intake.stopPushing();
+
+    }
 
     private void driveForward(double power) {
         robot.fl_motor.setPower(power);
@@ -244,12 +309,29 @@ public class AutoRedFar extends LinearOpMode {
         robot.br_motor.setPower(power);
     }
 
-    private void driveBackward(double power, long timeMs) {
+    private void driveForwardtimed(double power, long timeMS) {
+        robot.fl_motor.setPower(power);
+        robot.fr_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+        robot.br_motor.setPower(power);
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackwardTimed(double power, long timeMS) {
         robot.fl_motor.setPower(-power);
         robot.fr_motor.setPower(-power);
         robot.bl_motor.setPower(-power);
         robot.br_motor.setPower(-power);
-        sleep(timeMs);
-        drive.stop();
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackward(double power) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+
     }
 }
