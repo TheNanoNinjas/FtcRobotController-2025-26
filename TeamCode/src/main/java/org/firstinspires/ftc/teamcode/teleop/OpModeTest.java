@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.autonomous.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -18,6 +23,11 @@ OpModeTest extends OpMode {
     Intaker intake;
     ArtifactPusher artifactPusher;
 
+
+    private GoBildaPinpointDriver odo;
+    private Rev2mDistanceSensor distanceSensor;
+
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -26,6 +36,20 @@ OpModeTest extends OpMode {
         shooter = new Shooter(robot);
         intake = new Intaker(robot);
         artifactPusher = new ArtifactPusher(robot);
+
+        // Distance sensor
+        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+
+        // Odometry setup
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+
+        //change the offsets to however far our odometry pods are from the dead center of the robot
+        //x offset is for the side to side one, y offset is for the forward back one
+        odo.setOffsets(-88, 0.0);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
@@ -50,8 +74,23 @@ OpModeTest extends OpMode {
         handlePush();
         launchArtifacts();
 
+        updateOdoMetrics();
         telemetry.addData("Status", "Running");
         telemetry.update();
+    }
+
+    private void updateOdoMetrics() {
+
+
+        odo.update();
+        Pose2D pos = odo.getPosition();
+        double currentY = pos.getY(DistanceUnit.INCH);
+        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
+        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+        telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
+        telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
+        telemetry.addData("Current Heading (Degree)", "%.2f", currentHeading);
+
     }
 
     @Override
