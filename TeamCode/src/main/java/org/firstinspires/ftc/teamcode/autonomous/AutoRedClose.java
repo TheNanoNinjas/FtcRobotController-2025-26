@@ -132,7 +132,7 @@ public class AutoRedClose extends LinearOpMode {
             telemetry.addData("Drive Power", "%.2f", drivePower);
             telemetry.update();
 
-            if (Math.abs(error) < 0.5) break;
+            if (error< 0) break;
         }
         drive.stop();
         telemetry.addLine("Y target reached");
@@ -158,7 +158,7 @@ public class AutoRedClose extends LinearOpMode {
             telemetry.addData("Drive Power", "%.2f", drivePower);
             telemetry.update();
 
-            if (Math.abs(error) < 0.5) break;
+            if (error < 0) break;
         }
         drive.stop();
         telemetry.addLine("Y target reached");
@@ -218,7 +218,7 @@ public class AutoRedClose extends LinearOpMode {
             double errorX = targetXInches - currentX;
 
             // STOP CONDITION
-            if (Math.abs(errorX) < POSITION_TOLERANCE) break;
+            if (errorX < POSITION_TOLERANCE) break;
 
             // Determine left or right
             double strafePower = Math.copySign(power, errorX);
