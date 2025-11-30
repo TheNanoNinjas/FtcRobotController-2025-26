@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.autonomous.GoBildaPinpointDriver;
 
 import com.qualcomm.robotcore.hardware.IMU;
@@ -24,9 +26,9 @@ public class RobotHardware {
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
 
+    //Sensors
     private GoBildaPinpointDriver odo;
-
-    // Sensors
+    private Rev2mDistanceSensor distanceSensor;
     public IMU imu;
 
     public void init(HardwareMap hardwareMap) {
@@ -56,7 +58,51 @@ public class RobotHardware {
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
+
+        //Sensors
+        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        odo.setOffsets(-88, 0.0);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
     }
+
+    public void updateOdo(){
+        odo.update();
+    }
+
+    public double getOdoPositionY(DistanceUnit unit){
+        odo.update();
+        Pose2D position = odo.getPosition();
+
+        return position.getY(unit);
+    }
+
+    public double getOdoPositionX(DistanceUnit unit){
+        odo.update();
+        Pose2D position = odo.getPosition();
+
+        return position.getX(unit);
+    }
+
+    public double getOdoHeading(AngleUnit angleUnit){
+        odo.update();
+        return odo.getPosition().getHeading(angleUnit);
+    }
+
+    public Pose2D getOdoPosition(){
+        odo.update();
+       return odo.getPosition();
+    }
+
+
+
+
+
 
 
     public void setDrivePower(double fl, double fr, double bl, double br) {
@@ -83,6 +129,8 @@ public class RobotHardware {
         telemetry.addData("Right Shooter", rightShooter != null ? "OK" : "FAIL");
         telemetry.addData("Intake Motor", intakeMotor != null ? "OK" : "FAIL");
         telemetry.addData("Wheel Motor", wheelMotor != null ? "OK" : "FAIL");
+        telemetry.addData("Odometry Wheels", odo != null ? "OK" : "FAIL");
+        telemetry.addData("Distance Sensor", distanceSensor != null ? "OK" : "FAIL");
         telemetry.addData("Hardware", "Initialized");
     }
     

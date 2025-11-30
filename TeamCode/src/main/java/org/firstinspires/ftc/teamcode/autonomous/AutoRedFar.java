@@ -23,8 +23,8 @@ public class AutoRedFar extends LinearOpMode {
     private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
 
-    private GoBildaPinpointDriver odo;
-    private Rev2mDistanceSensor distanceSensor;
+   // private GoBildaPinpointDriver odo;
+   // private Rev2mDistanceSensor distanceSensor;
 
     private static final double KP = 0.05;
 
@@ -38,8 +38,6 @@ public class AutoRedFar extends LinearOpMode {
         intake = new Intaker(robot);
 
 
-        initializeSensors();
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -50,20 +48,7 @@ public class AutoRedFar extends LinearOpMode {
         }
     }
 
-    private void initializeSensors() {
-        // Distance sensor
-        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
 
-        // Odometry setup
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        odo.setOffsets(-88, 0.0);
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        odo.resetPosAndIMU();
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
-    }
 
     private void executeAutonomousSequence() {
         telemetry.addLine("Starting autonomous sequence");
@@ -112,7 +97,6 @@ public class AutoRedFar extends LinearOpMode {
         //launch artifacts
         launchArtifacts();
 
-        odo.update();
         // double startX = odo.getPosition().getX(DistanceUnit.INCH);
         //strafeToX(startX + 5.0, 0.3); // strafe right
 
@@ -138,8 +122,8 @@ public class AutoRedFar extends LinearOpMode {
                 break;
             }
 
-            odo.update();
-            double y = odo.getPosition().getY(DistanceUnit.INCH);
+
+            double y = robot.getOdoPositionY(DistanceUnit.INCH);
             double error = targetY - y;
 
             double drivePower = 0.25;
@@ -178,8 +162,8 @@ public class AutoRedFar extends LinearOpMode {
                 break;
             }
 
-            odo.update();
-            double y = odo.getPosition().getY(DistanceUnit.INCH);
+
+            double y = robot.getOdoPositionY(DistanceUnit.INCH);
             double error = targetY - y;
 
             double drivePower = 0.25;
@@ -203,16 +187,16 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void turnToHeading(double targetHeading) {
-        odo.update();
-        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+
+        double currentHeading = robot.getOdoHeading(AngleUnit.DEGREES);
         double error = targetHeading - currentHeading;
 
         // Normalize error to range -180 to +180
         error = ((error + 180) % 360) - 180;
 
         while (opModeIsActive() && Math.abs(error) > 1.0) {
-            odo.update();
-            currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+
+            currentHeading = robot.getOdoHeading(AngleUnit.DEGREES);
             error = targetHeading - currentHeading;
             error = ((error + 180) % 360) - 180;
 
@@ -234,8 +218,8 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void strafeToX(double targetXInches, double basePower) {
-        odo.update();
-        Pose2D startPos = odo.getPosition();
+
+        Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
         double currentX = startPos.getX(DistanceUnit.INCH);
@@ -246,8 +230,8 @@ public class AutoRedFar extends LinearOpMode {
         telemetry.update();
 
         while (opModeIsActive()) {
-            odo.update();
-            Pose2D pos = odo.getPosition();
+
+            Pose2D pos = robot.getOdoPosition();
 
             currentX = pos.getX(DistanceUnit.INCH);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
