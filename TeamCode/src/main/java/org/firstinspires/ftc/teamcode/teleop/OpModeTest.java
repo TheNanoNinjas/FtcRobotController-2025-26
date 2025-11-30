@@ -144,8 +144,6 @@ OpModeTest extends OpMode {
             intake.startPushing();
 
         }
-
-
         else {
             artifactPusher.stopPushing();
             intake.stopPushing();

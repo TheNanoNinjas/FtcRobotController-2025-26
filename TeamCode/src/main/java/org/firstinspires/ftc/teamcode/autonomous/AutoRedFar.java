@@ -70,46 +70,45 @@ public class AutoRedFar extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-
         moveToYTarget(6);
 
         // Turn to shooting angle
-        turnToHeading(346);
+        turnToHeading(343);
 
         // Launch artifacts
         launchArtifacts();
 
         //turn back to 0
-        turnToHeading(0);
+        turnToHeading(7);
 
         // go forward
-        moveToYTarget(24);
+        moveToYTarget(27);
 
-        //turn to intake
-        turnToHeading(95);
+        //turn to intake earlier value was 100
+        turnToHeading(94);
 
         //start intaking
         startIntake();
 
-        //go forward to intake
-        moveBackwardsToYTarget(30);
+        //go forward to intake, earlier value was 33
+        moveBackwardsToYTarget(29);
 
         sleep(750);
-        //move backwards after intake
-        driveForwardtimed(0.2, 1500);
+        //move backwards after intake, earlier time was 3500
+        driveForwardtimed(0.3, 2700);
 
         stopIntake();
 
-        //turn back to 0
-        turnToHeading(0);
+        //turn back to 0, earlier value is 7
+        turnToHeading(4);
 
         //move backwards to shooting zone
-        driveBackwardTimed(0.2, 1600);
+        driveBackwardTimed(0.25, 1600);
         sleep(1000);
 
-        driveForwardtimed(0.2, 400);
+        driveForwardtimed(0.25, 1000);
         //turn to shooting angle
-        turnToHeading(346);
+        turnToHeading(349);
 
         //launch artifacts
         launchArtifacts();

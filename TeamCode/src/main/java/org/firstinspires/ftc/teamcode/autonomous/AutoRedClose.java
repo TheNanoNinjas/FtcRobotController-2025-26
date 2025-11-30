@@ -28,8 +28,7 @@ public class AutoRedClose extends LinearOpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
-    private static final double KP = 0.10;
-    private static final double OBSTACLE_DISTANCE = 6.0;
+    private static final double KP = 0.05;
 
     @Override
     public void runOpMode() {
@@ -59,8 +58,6 @@ public class AutoRedClose extends LinearOpMode {
 
         // Odometry setup
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        //change the offsets to however far our odometry pods are from the dead center of the robot
-        //x offset is for the side to side one, y offset is for the forward back one
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(
@@ -71,37 +68,104 @@ public class AutoRedClose extends LinearOpMode {
     }
 
     private void executeAutonomousSequence() {
-        // Move forward to target or until obstacle detected
-        moveToYTarget(-60);
+        telemetry.addLine("Starting autonomous sequence");
+        telemetry.update();
 
-        //shoot
+        // Move forward to shooting position
+        driveBackwardTimed(0.3,5000);
+
+        // Launch artifacts
         launchArtifacts();
 
-        //turn
-        turnToHeading(225);
-
-        //strafe to intake
-        double startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX - 45, 0.3); // strafe left
-
-        intakeArtifacts(5000);
-
-        //go forward to intake artifacts
-        moveToYTarget(-21);
-        //go back after intaking
-        moveToYTarget(21);
-
-        startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX + 45, 0.3);
-
+        //turn back to 0
         turnToHeading(135);
 
+        odo.update();
+         double startX = odo.getPosition().getX(DistanceUnit.INCH);
+        strafeToX(startX - 20, 0.3); // strafe right
+
+        startIntake();
+
+        // go forward
+        moveBackwardsToYTarget(25);
+
+      driveForwardtimed(0.3,2000);
+
+        //start intaking
+        stopIntake();
+
+        //go forward to intake
+        odo.update();
+        startX = odo.getPosition().getX(DistanceUnit.INCH);
+        strafeToX(startX + 20, 0.3); // strafe right
+
+
+        turnToHeading(0);
+
         launchArtifacts();
 
+        turnToHeading(45);
+
+        driveBackwardTimed(0.3,4000);
+
+        telemetry.addLine("Autonomous sequence complete");
+        telemetry.update();
         drive.stop();
         shooter.stopShooting();
+        intake.stopPushing();
     }
 
+    private void moveToYTarget(double targetY) {
+        while (opModeIsActive()) {
+            odo.update();
+            double y = odo.getPosition().getY(DistanceUnit.INCH);
+            double error = targetY - y;
+
+            double drivePower = 0.25;
+            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
+
+            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+            driveForward(drivePower);
+
+            telemetry.addData("Target Y", "%.2f", targetY);
+            telemetry.addData("Current Y", "%.2f", y);
+            telemetry.addData("Error", "%.2f", error);
+            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.update();
+
+            if (Math.abs(error) < 0.5) break;
+        }
+        drive.stop();
+        telemetry.addLine("Y target reached");
+        telemetry.update();
+    }
+
+    private void moveBackwardsToYTarget(double targetY) {
+        while (opModeIsActive()) {
+            odo.update();
+            double y = odo.getPosition().getY(DistanceUnit.INCH);
+            double error = targetY - y;
+
+            double drivePower = 0.25;
+            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
+
+            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+            driveBackward(drivePower);
+
+            telemetry.addData("Target Y", "%.2f", targetY);
+            telemetry.addData("Current Y", "%.2f", y);
+            telemetry.addData("Error", "%.2f", error);
+            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.update();
+
+            if (Math.abs(error) < 0.5) break;
+        }
+        drive.stop();
+        telemetry.addLine("Y target reached");
+        telemetry.update();
+    }
 
     private void turnToHeading(double targetHeading) {
         odo.update();
@@ -117,7 +181,7 @@ public class AutoRedClose extends LinearOpMode {
             error = targetHeading - currentHeading;
             error = ((error + 180) % 360) - 180;
 
-            double turnPower = 0.3 * Math.signum(error);
+            double turnPower = 0.25 * Math.signum(error);
 
             // Turn using drive motors
             robot.fl_motor.setPower(-turnPower);
@@ -172,10 +236,10 @@ public class AutoRedClose extends LinearOpMode {
             double frPower = -strafePower + correction;
             double brPower = strafePower + correction;
 
-            robot.fl_motor.setPower(flPower);
+            robot.fl_motor.setPower(-flPower);
             robot.bl_motor.setPower(blPower);
             robot.fr_motor.setPower(frPower);
-            robot.br_motor.setPower(brPower);
+            robot.br_motor.setPower(-brPower);
 
             telemetry.addData("Target X (in)", targetXInches);
             telemetry.addData("Current X (in)", currentX);
@@ -188,42 +252,30 @@ public class AutoRedClose extends LinearOpMode {
             sleep(20);
         }
 
-
-        telemetry.addLine("=== Strafe Completed ===");
+        robot.stopAllMotors();
+        telemetry.addLine("Strafe Completed");
         telemetry.update();
     }
 
-    private void moveToYTarget(double targetY) {
-        while (opModeIsActive()) {
-            odo.update();
-            double y = odo.getPosition().getY(DistanceUnit.INCH);
-            double error = targetY - y;
-
-            double drivePower = 0.45; // fast by default
-            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
-
-            drivePower = Math.max(-0.5, Math.min(0.5, drivePower));
-
-            driveForward(drivePower);
-
-            if (Math.abs(error) < 0.5) break;
-        }
-        drive.stop();
-
-    }
-
     private void launchArtifacts() {
-        // Start shooter motors
+        telemetry.addLine("Starting shooter motors");
+        telemetry.update();
         shooter.startShootingFar();
         sleep(1000);
+
+        telemetry.addLine("Starting artifact pusher wheel");
+        telemetry.update();
         artifactPusherArtifacts.startWheel();
         sleep(1000);
 
+        telemetry.addLine("Starting intake and pusher");
+        telemetry.update();
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
         sleep(1500);
 
-        // Stop shooter
+        telemetry.addLine("Stopping all launch mechanisms");
+        telemetry.update();
         shooter.stopShooting();
         intake.stopPushing();
         artifactPusherArtifacts.stopPushing();
@@ -232,12 +284,14 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.update();
     }
 
-    private void intakeArtifacts(long timeMs) {
+    private void startIntake() {
         intake.startPushing();
-        sleep(timeMs);
-        intake.stopPushing();
     }
 
+    private void stopIntake() {
+        intake.stopPushing();
+
+    }
 
     private void driveForward(double power) {
         robot.fl_motor.setPower(power);
@@ -246,12 +300,29 @@ public class AutoRedClose extends LinearOpMode {
         robot.br_motor.setPower(power);
     }
 
-    private void driveBackward(double power, long timeMs) {
+    private void driveForwardtimed(double power, long timeMS) {
+        robot.fl_motor.setPower(power);
+        robot.fr_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+        robot.br_motor.setPower(power);
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackwardTimed(double power, long timeMS) {
         robot.fl_motor.setPower(-power);
         robot.fr_motor.setPower(-power);
         robot.bl_motor.setPower(-power);
         robot.br_motor.setPower(-power);
-        sleep(timeMs);
-        drive.stop();
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackward(double power) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+
     }
 }
