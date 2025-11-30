@@ -63,8 +63,8 @@ public class AutoRedFar extends LinearOpMode {
         // Launch artifacts
         launchArtifacts();
 
-        //turn back to 0
-        turnToHeading(7);
+        //turn back to 0, last value was 3
+        turnToHeading(3);
 
         // go forward
         moveToYTarget(27);
@@ -78,8 +78,9 @@ public class AutoRedFar extends LinearOpMode {
         //go forward to intake, earlier value was 33
         moveBackwardsToYTarget(30);
 
-        sleep(750);
-        //move backwards after intake, earlier time was 3500
+      /*  sleep(750);
+
+        //move backwards after intake, earlier time was 2000
         driveForwardtimed(0.3, 1300);
         stopIntake();
 
@@ -101,7 +102,7 @@ public class AutoRedFar extends LinearOpMode {
         //strafeToX(startX + 5.0, 0.3); // strafe right
 
         driveForwardtimed(0.2, 3000);
-
+*/
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
         drive.stop();
