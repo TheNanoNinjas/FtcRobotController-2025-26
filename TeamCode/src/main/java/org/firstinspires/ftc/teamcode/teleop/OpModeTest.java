@@ -24,8 +24,6 @@ OpModeTest extends OpMode {
     ArtifactPusher artifactPusher;
 
 
-    private GoBildaPinpointDriver odo;
-    private Rev2mDistanceSensor distanceSensor;
 
 
     @Override
@@ -37,19 +35,6 @@ OpModeTest extends OpMode {
         intake = new Intaker(robot);
         artifactPusher = new ArtifactPusher(robot);
 
-        // Distance sensor
-        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
-
-        // Odometry setup
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-
-        //change the offsets to however far our odometry pods are from the dead center of the robot
-        //x offset is for the side to side one, y offset is for the forward back one
-        odo.setOffsets(-88, 0.0);
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.REVERSED,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
@@ -82,11 +67,11 @@ OpModeTest extends OpMode {
     private void updateOdoMetrics() {
 
 
-        odo.update();
-        Pose2D pos = odo.getPosition();
-        double currentY = pos.getY(DistanceUnit.INCH);
-        double distanceInches = distanceSensor.getDistance(DistanceUnit.INCH);
-        double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
+
+        Pose2D pos = robot.getOdoPosition();
+        double currentY = pos.getY(DistanceUnit.MM);
+        double distanceInches = robot.getOdoPositionY(DistanceUnit.MM);
+        double currentHeading = robot.getOdoHeading(AngleUnit.DEGREES);
         telemetry.addData("Intake Move Y (in)", "%.2f", currentY);
         telemetry.addData("Distance Sensor (in)", "%.2f", distanceInches);
         telemetry.addData("Current Heading (Degree)", "%.2f", currentHeading);

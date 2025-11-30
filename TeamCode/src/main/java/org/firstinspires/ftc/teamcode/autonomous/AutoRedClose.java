@@ -81,7 +81,7 @@ public class AutoRedClose extends LinearOpMode {
 
         odo.update();
          double startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX - 6, 0.3); // strafe left
+        strafeToX(startX - 5, 0.3); // strafe left
 
         startIntake();
 
@@ -96,15 +96,15 @@ public class AutoRedClose extends LinearOpMode {
         //go forward to intake
         odo.update();
         startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX + 6, 0.3); // strafe right
+        strafeToX(startX + 5, 0.3); // strafe right
 
         turnToHeading(0);
 
         launchArtifacts();
 
-        turnToHeading(45);
+        turnToHeading(63);
 
-        driveBackwardTimed(0.3,4000);
+        driveBackwardTimed(0.3,1000);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();

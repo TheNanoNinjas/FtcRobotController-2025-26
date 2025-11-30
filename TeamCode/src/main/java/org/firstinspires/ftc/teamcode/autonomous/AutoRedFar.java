@@ -48,14 +48,12 @@ public class AutoRedFar extends LinearOpMode {
         }
     }
 
-
-
     private void executeAutonomousSequence() {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
 
         // Move forward to shooting position
-        moveToYTarget(6);
+        moveToYTarget(192);
 
         // Turn to shooting angle
         turnToHeading(341);
@@ -64,28 +62,30 @@ public class AutoRedFar extends LinearOpMode {
         launchArtifacts();
 
         //turn back to 0, last value was 3
-        turnToHeading(3);
+        turnToHeading(4);
 
         // go forward
-        moveToYTarget(27);
+        moveToYTarget(670);
 
         //turn to intake earlier value was 100
         turnToHeading(94);
 
+        sleep(500);
+
         //start intaking
         startIntake();
 
-        //go forward to intake, earlier value was 33
-        moveBackwardsToYTarget(30);
+        //go forward to intake, earlier value was 810
+        moveBackwardsToYTarget(780);
 
-      /*  sleep(750);
+       sleep(750);
 
         //move backwards after intake, earlier time was 2000
-        driveForwardtimed(0.3, 1300);
+        driveForwardtimed(0.3, 2350);
         stopIntake();
 
         //turn back to 0, earlier value is 7
-        turnToHeading(20);
+        turnToHeading(4);
 
         //move backwards to shooting zone
         driveBackwardTimed(0.25, 1600);
@@ -93,16 +93,16 @@ public class AutoRedFar extends LinearOpMode {
 
         driveForwardtimed(0.25, 500);
         //turn to shooting angle
-        turnToHeading(352);
+        turnToHeading(350);
 
         //launch artifacts
         launchArtifacts();
 
-        // double startX = odo.getPosition().getX(DistanceUnit.INCH);
+        // double startX = odo.getPosition().getX(DistanceUnit.MM);
         //strafeToX(startX + 5.0, 0.3); // strafe right
 
         driveForwardtimed(0.2, 3000);
-*/
+
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
         drive.stop();
@@ -124,7 +124,7 @@ public class AutoRedFar extends LinearOpMode {
             }
 
 
-            double y = robot.getOdoPositionY(DistanceUnit.INCH);
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
 
             double drivePower = 0.25;
@@ -141,7 +141,7 @@ public class AutoRedFar extends LinearOpMode {
             telemetry.addData("Timeout", (System.currentTimeMillis() - startTime) + " / " + timeout);
             telemetry.update();
 
-            if (Math.abs(error) < 0.5) break;
+            if (error < 0) break;
         }
 
         drive.stop();
@@ -164,23 +164,23 @@ public class AutoRedFar extends LinearOpMode {
             }
 
 
-            double y = robot.getOdoPositionY(DistanceUnit.INCH);
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
 
-            double drivePower = 0.25;
+            double drivePower = 0.35;
             if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+            drivePower = Math.max(-0.35, Math.min(0.35, drivePower));
 
             driveBackward(drivePower);
 
-            telemetry.addData("Target Y", "%.2f", targetY);
-            telemetry.addData("Current Y", "%.2f", y);
-            telemetry.addData("Error", "%.2f", error);
-            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.addData("Target Y", targetY);
+            telemetry.addData("Current Y", y);
+            telemetry.addData("Error", error);
+            telemetry.addData("Drive Power", drivePower);
             telemetry.update();
 
-            if (Math.abs(error) < 0.5) break;
+            if (error < 0) break;
         }
         drive.stop();
         telemetry.addLine("Y target reached");
@@ -223,7 +223,7 @@ public class AutoRedFar extends LinearOpMode {
         Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
-        double currentX = startPos.getX(DistanceUnit.INCH);
+        double currentX = startPos.getX(DistanceUnit.MM);
         double error = targetXInches - currentX;
         double direction = Math.signum(error);
 
@@ -234,7 +234,7 @@ public class AutoRedFar extends LinearOpMode {
 
             Pose2D pos = robot.getOdoPosition();
 
-            currentX = pos.getX(DistanceUnit.INCH);
+            currentX = pos.getX(DistanceUnit.MM);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
             error = targetXInches - currentX;
 
