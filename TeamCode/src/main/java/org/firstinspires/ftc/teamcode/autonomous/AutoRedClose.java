@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
 @Autonomous(name = "Auto Red Alliance Close", group = "Competition")
-@Disabled
 public class AutoRedClose extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
@@ -72,7 +71,7 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveBackwardTimed(0.3,5000);
+        driveBackwardTimed(0.3,2000);
 
         // Launch artifacts
         launchArtifacts();
@@ -82,14 +81,14 @@ public class AutoRedClose extends LinearOpMode {
 
         odo.update();
          double startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX - 20, 0.3); // strafe right
+        strafeToX(startX - 6, 0.3); // strafe left
 
         startIntake();
 
         // go forward
-        moveBackwardsToYTarget(25);
+        moveBackwardsToYTarget(-20);
 
-      driveForwardtimed(0.3,2000);
+        driveForwardtimed(0.3,1700);
 
         //start intaking
         stopIntake();
@@ -97,8 +96,7 @@ public class AutoRedClose extends LinearOpMode {
         //go forward to intake
         odo.update();
         startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX + 20, 0.3); // strafe right
-
+        strafeToX(startX + 6, 0.3); // strafe right
 
         turnToHeading(0);
 
@@ -198,58 +196,59 @@ public class AutoRedClose extends LinearOpMode {
         drive.stop();
     }
 
-    private void strafeToX(double targetXInches, double basePower) {
+    private void strafeToX(double targetXInches, double power) {
+        final double HEADING_KP = 0.015;   // heading correction
+        final double POSITION_TOLERANCE = 0.5;  // inches
+
         odo.update();
         Pose2D startPos = odo.getPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
-
-        double currentX = startPos.getX(DistanceUnit.INCH);
-        double error = targetXInches - currentX;
-        double direction = Math.signum(error);
 
         telemetry.addLine("Strafe Started");
         telemetry.update();
 
         while (opModeIsActive()) {
+
             odo.update();
             Pose2D pos = odo.getPosition();
 
-            currentX = pos.getX(DistanceUnit.INCH);
-            double currentHeading = pos.getHeading(AngleUnit.DEGREES);
-            error = targetXInches - currentX;
+            double currentX = pos.getX(DistanceUnit.INCH);
+            double heading = pos.getHeading(AngleUnit.DEGREES);
 
-            // Stop when close enough
-            if (Math.abs(error) < 0.5) break;
+            double errorX = targetXInches - currentX;
 
-            // Calculate heading error
-            double headingError = ((startHeading - currentHeading + 180) % 360) - 180;
+            // STOP CONDITION
+            if (Math.abs(errorX) < POSITION_TOLERANCE) break;
 
+            // Determine left or right
+            double strafePower = Math.copySign(power, errorX);
 
-            double correction = 0.02 * headingError;  // tweak 0.02 if needed
+            // Heading correction (keeps robot facing same direction)
+            double headingError = ((startHeading - heading + 180) % 360) - 180;
+            double correction = HEADING_KP * headingError;
 
-            // Base strafe power
-            double strafePower = direction * Math.abs(basePower);
+            // Proper mecanum strafe powers
+            double fl =  strafePower - correction;
+            double fr = -strafePower + correction;
+            double bl = -strafePower - correction;
+            double br =  strafePower + correction;
 
-            // Apply heading correction to each side
-            double flPower = strafePower - correction;
-            double blPower = -strafePower - correction;
-            double frPower = -strafePower + correction;
-            double brPower = strafePower + correction;
+            // Apply to motors
+            robot.fl_motor.setPower(fl);
+            robot.fr_motor.setPower(fr);
+            robot.bl_motor.setPower(bl);
+            robot.br_motor.setPower(br);
 
-            robot.fl_motor.setPower(-flPower);
-            robot.bl_motor.setPower(blPower);
-            robot.fr_motor.setPower(frPower);
-            robot.br_motor.setPower(-brPower);
-
-            telemetry.addData("Target X (in)", targetXInches);
-            telemetry.addData("Current X (in)", currentX);
-            telemetry.addData("Remaining Distance (in)", "%.2f", error);
-            telemetry.addData("Heading", "%.2f", currentHeading);
-            telemetry.addData("Heading Error", "%.2f", headingError);
-            telemetry.addData("Correction", "%.2f", correction);
+            // Telemetry
+            telemetry.addData("Target X", targetXInches);
+            telemetry.addData("Current X", currentX);
+            telemetry.addData("Error X", errorX);
+            telemetry.addData("Heading", heading);
+            telemetry.addData("Heading Error", headingError);
+            telemetry.addData("Correction", correction);
             telemetry.update();
 
-            sleep(20);
+            sleep(15);
         }
 
         robot.stopAllMotors();
@@ -257,10 +256,11 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.update();
     }
 
+
     private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
-        shooter.startShootingFar();
+        shooter.startShootingClose();
         sleep(1000);
 
         telemetry.addLine("Starting artifact pusher wheel");

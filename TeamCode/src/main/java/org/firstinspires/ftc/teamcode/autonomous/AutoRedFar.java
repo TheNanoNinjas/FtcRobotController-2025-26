@@ -73,7 +73,7 @@ public class AutoRedFar extends LinearOpMode {
         moveToYTarget(6);
 
         // Turn to shooting angle
-        turnToHeading(343);
+        turnToHeading(341);
 
         // Launch artifacts
         launchArtifacts();
@@ -91,24 +91,23 @@ public class AutoRedFar extends LinearOpMode {
         startIntake();
 
         //go forward to intake, earlier value was 33
-        moveBackwardsToYTarget(29);
+        moveBackwardsToYTarget(30);
 
         sleep(750);
         //move backwards after intake, earlier time was 3500
-        driveForwardtimed(0.3, 2700);
-
+        driveForwardtimed(0.3, 1300);
         stopIntake();
 
         //turn back to 0, earlier value is 7
-        turnToHeading(4);
+        turnToHeading(20);
 
         //move backwards to shooting zone
         driveBackwardTimed(0.25, 1600);
         sleep(1000);
 
-        driveForwardtimed(0.25, 1000);
+        driveForwardtimed(0.25, 500);
         //turn to shooting angle
-        turnToHeading(349);
+        turnToHeading(352);
 
         //launch artifacts
         launchArtifacts();
@@ -127,7 +126,18 @@ public class AutoRedFar extends LinearOpMode {
     }
 
     private void moveToYTarget(double targetY) {
+        long startTime = System.currentTimeMillis();
+        long timeout = 6500;  // timeout in milliseconds)
+
         while (opModeIsActive()) {
+
+            // timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                telemetry.addLine("Timeout: moving on to next step");
+                telemetry.update();
+                break;
+            }
+
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
@@ -139,21 +149,35 @@ public class AutoRedFar extends LinearOpMode {
 
             driveForward(drivePower);
 
-            telemetry.addData("Target Y", "%.2f", targetY);
-            telemetry.addData("Current Y", "%.2f", y);
-            telemetry.addData("Error", "%.2f", error);
-            telemetry.addData("Drive Power", "%.2f", drivePower);
+            telemetry.addData("Target Y", targetY);
+            telemetry.addData("Current Y", y);
+            telemetry.addData("Error", error);
+            telemetry.addData("Drive Power", drivePower);
+            telemetry.addData("Timeout", (System.currentTimeMillis() - startTime) + " / " + timeout);
             telemetry.update();
 
             if (Math.abs(error) < 0.5) break;
         }
+
         drive.stop();
-        telemetry.addLine("Y target reached");
+        telemetry.addLine("Y move finished");
         telemetry.update();
     }
 
+
     private void moveBackwardsToYTarget(double targetY) {
+        long startTime = System.currentTimeMillis();
+        long timeout = 5000;  // timeout in milliseconds)
+
         while (opModeIsActive()) {
+
+            // timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                telemetry.addLine("Timeout: moving on to next step");
+                telemetry.update();
+                break;
+            }
+
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
