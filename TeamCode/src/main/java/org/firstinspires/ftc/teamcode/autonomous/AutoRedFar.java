@@ -116,13 +116,11 @@ public class AutoRedFar extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // timeout
-            if (System.currentTimeMillis() - startTime > timeout) {
-                telemetry.addLine("Timeout: moving on to next step");
-                telemetry.update();
-                break;
-            }
+        /*     if (robot.getOdoPositionY(DistanceUnit.MM)> targetY &&
+                     System.currentTimeMillis() - startTime > timeout){
 
+
+             }*/
 
             double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
@@ -218,13 +216,13 @@ public class AutoRedFar extends LinearOpMode {
         drive.stop();
     }
 
-    private void strafeToX(double targetXInches, double basePower) {
+    private void strafeToX(double targetXMM, double basePower) {
 
         Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
         double currentX = startPos.getX(DistanceUnit.MM);
-        double error = targetXInches - currentX;
+        double error = targetXMM - currentX;
         double direction = Math.signum(error);
 
         telemetry.addLine("Strafe Started");
@@ -236,7 +234,7 @@ public class AutoRedFar extends LinearOpMode {
 
             currentX = pos.getX(DistanceUnit.MM);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
-            error = targetXInches - currentX;
+            error = targetXMM - currentX;
 
             // Stop when close enough
             if (Math.abs(error) < 0.5) break;
@@ -261,7 +259,7 @@ public class AutoRedFar extends LinearOpMode {
             robot.fr_motor.setPower(frPower);
             robot.br_motor.setPower(-brPower);
 
-            telemetry.addData("Target X (in)", targetXInches);
+            telemetry.addData("Target X (in)", targetXMM);
             telemetry.addData("Current X (in)", currentX);
             telemetry.addData("Remaining Distance (in)", "%.2f", error);
             telemetry.addData("Heading", "%.2f", currentHeading);

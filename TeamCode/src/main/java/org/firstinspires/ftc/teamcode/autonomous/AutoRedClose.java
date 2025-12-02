@@ -71,24 +71,22 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveBackwardTimed(0.3,2150);
+        driveBackwardTimed(0.3,2350);
 
         // Launch artifacts
         launchArtifacts();
 
-        //turn back to 0
-        turnToHeading(135);
+        driveForwardtimed(0.3,500);
 
-      //  odo.update();
-      //   double startX = odo.getPosition().getX(DistanceUnit.INCH);
-      //  strafeToX(startX - 6, 0.3); // strafe left
+        turnToHeading(135);
 
         startIntake();
 
         // go forward
-        moveBackwardsToYTarget(-23);
+        moveBackwardsToYTarget(-25);
 
-        driveForwardtimed(0.3,1700);
+        sleep(1000);
+        driveForwardtimed(0.3,1950);
 
         //start intaking
         stopIntake();
@@ -99,6 +97,8 @@ public class AutoRedClose extends LinearOpMode {
      //   strafeToX(startX + 6, 0.3); // strafe right
 
         turnToHeading(0);
+
+        driveBackwardTimed(0.3,500);
 
         launchArtifacts();
 
@@ -114,7 +114,17 @@ public class AutoRedClose extends LinearOpMode {
     }
 
     private void moveToYTarget(double targetY) {
+        long startTime = System.currentTimeMillis();
+        long timeout = 6500;  // timeout in milliseconds)
+
         while (opModeIsActive()) {
+
+            // timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                telemetry.addLine("TIMEOUT: going to next operation");
+                telemetry.update();
+                break;
+            }
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
@@ -140,7 +150,17 @@ public class AutoRedClose extends LinearOpMode {
     }
 
     private void moveBackwardsToYTarget(double targetY) {
+        long startTime = System.currentTimeMillis();
+        long timeout = 4500;  // timeout in milliseconds)
+
         while (opModeIsActive()) {
+
+            // timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                telemetry.addLine("Timeout: moving on to next step");
+                telemetry.update();
+                break;
+            }
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
@@ -266,7 +286,7 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
         artifactPusherArtifacts.startWheel();
-        sleep(1000);
+        sleep(2500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();

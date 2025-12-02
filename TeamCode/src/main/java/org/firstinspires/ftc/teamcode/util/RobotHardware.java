@@ -41,7 +41,7 @@ public class RobotHardware {
         // Set drive motor directions (left motors reversed)
         fl_motor.setDirection(DcMotor.Direction.REVERSE);
         bl_motor.setDirection(DcMotor.Direction.REVERSE);
-        br_motor.setDirection(DcMotor.Direction.REVERSE);
+
 
         // Mechanism Motors
         leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
