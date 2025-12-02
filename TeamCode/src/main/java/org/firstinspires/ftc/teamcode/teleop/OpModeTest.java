@@ -93,16 +93,20 @@ OpModeTest extends OpMode {
 
         // Field-relative drive (default) or robot-relative (right bumper)
         if (gamepad1.right_bumper) {
-            // Robot-relative drive
-            drive.mecanumDrive(-gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x);
-        } else {
+
             // Field-relative drive
             drive.driveFieldRelative(-gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
+                    gamepad1.left_stick_x,
+                    gamepad1.right_stick_x,
                     robot.imu);
+
+        } else {
+
+
+            // Robot-relative drive
+            drive.mecanumDrive(-gamepad1.left_stick_y,
+                    gamepad1.left_stick_x,
+                    gamepad1.right_stick_x);
         }
     }
 

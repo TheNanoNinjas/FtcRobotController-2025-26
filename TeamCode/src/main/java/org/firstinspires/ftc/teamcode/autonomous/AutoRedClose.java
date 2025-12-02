@@ -71,7 +71,7 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveBackwardTimed(0.3,2000);
+        driveBackwardTimed(0.3,2150);
 
         // Launch artifacts
         launchArtifacts();
@@ -79,14 +79,14 @@ public class AutoRedClose extends LinearOpMode {
         //turn back to 0
         turnToHeading(135);
 
-        odo.update();
-         double startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX - 5, 0.3); // strafe left
+      //  odo.update();
+      //   double startX = odo.getPosition().getX(DistanceUnit.INCH);
+      //  strafeToX(startX - 6, 0.3); // strafe left
 
         startIntake();
 
         // go forward
-        moveBackwardsToYTarget(-20);
+        moveBackwardsToYTarget(-23);
 
         driveForwardtimed(0.3,1700);
 
@@ -94,9 +94,9 @@ public class AutoRedClose extends LinearOpMode {
         stopIntake();
 
         //go forward to intake
-        odo.update();
-        startX = odo.getPosition().getX(DistanceUnit.INCH);
-        strafeToX(startX + 5, 0.3); // strafe right
+     //   odo.update();
+     //   startX = odo.getPosition().getX(DistanceUnit.INCH);
+     //   strafeToX(startX + 6, 0.3); // strafe right
 
         turnToHeading(0);
 
