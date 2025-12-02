@@ -80,12 +80,12 @@ public class AutoRedFar extends LinearOpMode {
 
        sleep(750);
 
-        //move backwards after intake, earlier time was 2000
-        driveForwardtimed(0.3, 2350);
+        //move backwards after intake, earlier time was 2350
+        driveForwardtimed(0.3, 2100);
         stopIntake();
 
-        //turn back to 0, earlier value is 7
-        turnToHeading(4);
+        //turn back to 0, earlier value is 4
+        turnToHeading(8);
 
         //move backwards to shooting zone
         driveBackwardTimed(0.25, 1600);
