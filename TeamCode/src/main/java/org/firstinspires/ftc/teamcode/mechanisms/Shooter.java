@@ -6,8 +6,8 @@ public class Shooter {
     private RobotHardware robot;
 
     //Autonomous long rangshooting working well with 0.58 power.
-    private static double LONG_RANGE_POWER = 0.645;
-    private static double SHORT_RANGE_POWER = 0.585;
+    private static double LONG_RANGE_POWER = 0.605;
+    private static double SHORT_RANGE_POWER = 0.56;
 
     private static double MANUAL_INTAKE_POWER = -0.5;
 

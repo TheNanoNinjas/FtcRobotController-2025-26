@@ -128,7 +128,11 @@ OpModeTest extends OpMode {
             intake.reversePush();
             artifactPusher.reversePush();
 
+        } else if (gamepad2.triangle){
+            artifactPusher.startWheel();
+
         }
+
         else if(gamepad1.left_bumper){
             intake.startPushing();
 

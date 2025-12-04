@@ -71,12 +71,12 @@ public class AutoBlueClose extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveBackwardTimed(0.3,2800);
+        driveBackwardTimed(0.3,2900);
 
         // Launch artifacts
         launchArtifacts();
 
-     //   driveForwardtimed(0.3,600);
+        driveForwardtimed(0.3,200);
 
         turnToHeading(225);
 
@@ -97,6 +97,8 @@ public class AutoBlueClose extends LinearOpMode {
         //   strafeToX(startX + 6, 0.3); // strafe right
 
         turnToHeading(347);
+
+        driveBackwardTimed(0.2,600   );
 
         launchArtifacts();
 
