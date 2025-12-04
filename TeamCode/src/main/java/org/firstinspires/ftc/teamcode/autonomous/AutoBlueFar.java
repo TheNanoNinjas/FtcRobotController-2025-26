@@ -68,7 +68,7 @@ public class AutoBlueFar extends LinearOpMode {
         moveToYTarget(670);
 
         //turn to intake earlier value was 100
-        turnToHeading(94);
+        turnToHeading(270);
 
         sleep(500);
 

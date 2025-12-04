@@ -71,19 +71,19 @@ public class AutoBlueClose extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveBackwardTimed(0.3,2350);
+        driveBackwardTimed(0.3,2800);
 
         // Launch artifacts
         launchArtifacts();
 
-        driveForwardtimed(0.3,600);
+     //   driveForwardtimed(0.3,600);
 
         turnToHeading(225);
 
         startIntake();
 
         // go forward
-        moveBackwardsToYTarget(-25);
+        moveBackwardsToYTarget(-35);
 
         sleep(1000);
         driveForwardtimed(0.3,1950);
@@ -96,7 +96,7 @@ public class AutoBlueClose extends LinearOpMode {
         //   startX = odo.getPosition().getX(DistanceUnit.INCH);
         //   strafeToX(startX + 6, 0.3); // strafe right
 
-        turnToHeading(0);
+        turnToHeading(347);
 
         launchArtifacts();
 
@@ -114,7 +114,7 @@ public class AutoBlueClose extends LinearOpMode {
     private void moveToYTarget(double targetY) {
         long startTime = System.currentTimeMillis();
         long timeout = 6500;  // timeout in milliseconds)
-
+        double distINCH = robot.distanceSensor.getDistance(DistanceUnit.INCH);
         while (opModeIsActive()) {
 
             // timeout
@@ -123,6 +123,8 @@ public class AutoBlueClose extends LinearOpMode {
                 telemetry.update();
                 break;
             }
+
+
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
@@ -134,6 +136,22 @@ public class AutoBlueClose extends LinearOpMode {
 
             driveForward(drivePower);
 
+            boolean targetReached = Math.abs(error) < 1.0;
+            boolean obstacleClose = distINCH < 20;
+
+            if (targetReached || obstacleClose) {
+                robot.stopAllMotors();
+                telemetry.addLine("STOPPED!");
+                if (targetReached) telemetry.addLine("Reason: Target Reached");
+                if (obstacleClose) {
+                    telemetry.addLine("Reason: Obstacle Detected");
+                    telemetry.update();
+
+                    robot.stopAllMotors();
+                }
+                telemetry.update();
+                break;
+            }
             telemetry.addData("Target Y", "%.2f", targetY);
             telemetry.addData("Current Y", "%.2f", y);
             telemetry.addData("Error", "%.2f", error);
@@ -150,6 +168,7 @@ public class AutoBlueClose extends LinearOpMode {
     private void moveBackwardsToYTarget(double targetY) {
         long startTime = System.currentTimeMillis();
         long timeout = 4500;  // timeout in milliseconds)
+        double distCM = robot.distanceSensor.getDistance(DistanceUnit.INCH);
 
         while (opModeIsActive()) {
 
@@ -159,6 +178,7 @@ public class AutoBlueClose extends LinearOpMode {
                 telemetry.update();
                 break;
             }
+
             odo.update();
             double y = odo.getPosition().getY(DistanceUnit.INCH);
             double error = targetY - y;
@@ -170,6 +190,21 @@ public class AutoBlueClose extends LinearOpMode {
 
             driveBackward(drivePower);
 
+            boolean targetReached = Math.abs(error) < 1.0;
+            boolean obstacleClose = distCM < 40;
+
+            if (targetReached || obstacleClose) {
+                telemetry.addLine("STOPPED!");
+                if (targetReached) telemetry.addLine("Reason: Target Reached");
+                if (obstacleClose) {
+                    telemetry.addLine("Reason: Obstacle Detected");
+                    telemetry.update();
+
+                    robot.stopAllMotors();
+                }
+                telemetry.update();
+                break;
+            }
             telemetry.addData("Target Y", "%.2f", targetY);
             telemetry.addData("Current Y", "%.2f", y);
             telemetry.addData("Error", "%.2f", error);

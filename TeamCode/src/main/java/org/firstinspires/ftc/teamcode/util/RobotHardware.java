@@ -28,7 +28,7 @@ public class RobotHardware {
 
     //Sensors
     private GoBildaPinpointDriver odo;
-    private Rev2mDistanceSensor distanceSensor;
+    public Rev2mDistanceSensor distanceSensor;
     public IMU imu;
 
     public void init(HardwareMap hardwareMap) {
@@ -60,7 +60,7 @@ public class RobotHardware {
 
 
         //Sensors
-        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
