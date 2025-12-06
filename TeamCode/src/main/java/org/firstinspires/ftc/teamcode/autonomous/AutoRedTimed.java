@@ -56,35 +56,36 @@ public class AutoRedTimed extends LinearOpMode {
         driveForwardtimed(0.3,400);
 
         // Turn to shooting angle
-        turnRight(0.3,230);
+        turnRight(0.3,300);
 
         // Launch artifacts
         launchArtifacts();
 
         //turn back to 0, last value was 3
-        turnLeft(0.3,325);
+        turnLeft(0.3,395);
 
         // go forward
-        driveForwardtimed(0.3,1000);
+        driveForwardtimed(0.3,1450);
 
         //turn to intake earlier value was 100
-        turnLeft(0.3,1100);
+        turnLeft(0.3,1200);
 
         sleep(500);
 
         //start intaking
         startIntake();
 
-        //go forward to intake, earlier value was 810
-        driveBackwardTimed(0.3,2350);
+        //go forward to intake, earlier value was 2600
+        driveBackwardTimed(0.35,3000);
 
+        startIntake();
         //move backwards after intake, earlier time was 2350
-        driveForwardtimed(0.3, 2050);
+        driveForwardtimed(0.3, 2500);
 
         stopIntake();
 
         //turn back to 0, earlier value is 4
-        turnRight(0.3,1100);
+        turnRight(0.3,1200);
 
         //move backwards to shooting zone
         driveBackwardTimed(0.25, 1100);
@@ -277,18 +278,26 @@ public class AutoRedTimed extends LinearOpMode {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
         shooter.startShootingFar();
-        sleep(1000);
+        sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
         artifactPusherArtifacts.startWheel();
-        sleep(1000);
+        sleep(1500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
-        sleep(1500);
+        sleep(500);
+
+        intake.stopPushing();
+        artifactPusherArtifacts.stopPushing();
+        sleep(1750);
+
+        intake.startPushing();
+        artifactPusherArtifacts.startWheel();
+        sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");
         telemetry.update();

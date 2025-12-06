@@ -6,8 +6,9 @@ public class Shooter {
     private RobotHardware robot;
 
     //Autonomous long rangshooting working well with 0.58 power.
-    private static double LONG_RANGE_POWER = 0.605;
+    private static double LONG_RANGE_POWER = 0.68257;
     private static double SHORT_RANGE_POWER = 0.56;
+    private static double AUTO_SHORT_POWER = 0.6;
 
     private static double MANUAL_INTAKE_POWER = -0.5;
 
@@ -23,6 +24,10 @@ public class Shooter {
         robot.rightShooter.setPower(LONG_RANGE_POWER);
     }
 
+    public void startShootingAutoClose(){
+        robot.leftShooter.setPower(AUTO_SHORT_POWER);
+        robot.rightShooter.setPower((AUTO_SHORT_POWER));
+    }
 
     public void manualIntakeShooter() {
         robot.leftShooter.setPower(MANUAL_INTAKE_POWER);

@@ -24,8 +24,6 @@ OpModeTest extends OpMode {
     ArtifactPusher artifactPusher;
 
 
-
-
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -55,7 +53,7 @@ OpModeTest extends OpMode {
     @Override
     public void loop() {
         handleDriving();
-        handleIntake();
+
         handlePush();
         launchArtifacts();
 
@@ -65,7 +63,6 @@ OpModeTest extends OpMode {
     }
 
     private void updateOdoMetrics() {
-
 
 
         Pose2D pos = robot.getOdoPosition();
@@ -110,14 +107,6 @@ OpModeTest extends OpMode {
         }
     }
 
-    private void handleIntake() {
-        if (gamepad1.left_bumper) {
-            intake.startPushing();
-        } else {
-            intake.stopPushing();
-        }
-    }
-
 
     private void handlePush() {
         if (gamepad2.cross) {
@@ -128,16 +117,20 @@ OpModeTest extends OpMode {
             intake.reversePush();
             artifactPusher.reversePush();
 
-        } else if (gamepad2.triangle){
+        } else if (gamepad2.right_trigger > 0)
+        {
             artifactPusher.startWheel();
 
-        }
-
-        else if(gamepad1.left_bumper){
+        } else if (gamepad2.left_trigger > 0)
+        {
+            artifactPusher.reversePush();
+        } else if (gamepad1.left_bumper) {
             intake.startPushing();
 
-        }
-        else {
+        } else if (gamepad2.dpad_up) {
+            intake.startPushing();
+
+        } else {
             artifactPusher.stopPushing();
             intake.stopPushing();
         }

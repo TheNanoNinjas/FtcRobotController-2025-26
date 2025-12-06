@@ -19,7 +19,7 @@ public class ArtifactPusher {
     }
 
     public void reversePush() {
-        robot.wheelMotor.setPower(-1.0);
+        robot.wheelMotor.setPower(-.5);
     }
 
     public void setPushPower(double power) {

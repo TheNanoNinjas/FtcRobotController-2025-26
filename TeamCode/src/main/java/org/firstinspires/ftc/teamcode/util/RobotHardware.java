@@ -28,7 +28,7 @@ public class RobotHardware {
 
     //Sensors
     private GoBildaPinpointDriver odo;
-    public Rev2mDistanceSensor distanceSensor;
+    public Rev2mDistanceSensor distance_sensor;
     public IMU imu;
 
     public void init(HardwareMap hardwareMap) {
@@ -53,14 +53,14 @@ public class RobotHardware {
 
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 
         //Sensors
-        distanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, "distanceSensor");
+        distance_sensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.setOffsets(-88, 0.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -130,7 +130,7 @@ public class RobotHardware {
         telemetry.addData("Intake Motor", intakeMotor != null ? "OK" : "FAIL");
         telemetry.addData("Wheel Motor", wheelMotor != null ? "OK" : "FAIL");
         telemetry.addData("Odometry Wheels", odo != null ? "OK" : "FAIL");
-        telemetry.addData("Distance Sensor", distanceSensor != null ? "OK" : "FAIL");
+        telemetry.addData("Distance Sensor", distance_sensor != null ? "OK" : "FAIL");
         telemetry.addData("Hardware", "Initialized");
     }
     

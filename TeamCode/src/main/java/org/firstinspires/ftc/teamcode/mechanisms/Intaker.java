@@ -18,7 +18,7 @@ public class Intaker {
     }
 
     public void reversePush() {
-        robot.intakeMotor.setPower(-1.0);
+        robot.intakeMotor.setPower(-.5);
     }
 
     public void setPushPower(double power) {

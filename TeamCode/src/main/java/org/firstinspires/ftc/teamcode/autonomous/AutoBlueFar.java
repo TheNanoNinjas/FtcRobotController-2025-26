@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance Far", group = "Competition")
+@Autonomous(name = "Auto Blue Alliance Timed Far", group = "Competition")
 public class AutoBlueFar extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
@@ -53,22 +53,22 @@ public class AutoBlueFar extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        moveToYTarget(192);
+        driveForwardtimed(0.3,400);
 
         // Turn to shooting angle
-        turnToHeading(19);
+        turnLeft(0.3,300);
 
         // Launch artifacts
         launchArtifacts();
 
         //turn back to 0, last value was 3
-        turnToHeading(4);
+        turnRight(0.3,395);
 
         // go forward
-        moveToYTarget(670);
+        driveForwardtimed(0.3,1200);
 
         //turn to intake earlier value was 100
-        turnToHeading(270);
+        turnRight(0.3,1200);
 
         sleep(500);
 
@@ -76,24 +76,24 @@ public class AutoBlueFar extends LinearOpMode {
         startIntake();
 
         //go forward to intake, earlier value was 810
-        moveBackwardsToYTarget(780);
-
-        sleep(750);
+        driveBackwardTimed(0.3,2350);
 
         //move backwards after intake, earlier time was 2350
-        driveForwardtimed(0.3, 2100);
+        driveForwardtimed(0.3, 2050);
+
         stopIntake();
 
         //turn back to 0, earlier value is 4
-        turnToHeading(8);
+        turnLeft(0.3,1200);
 
         //move backwards to shooting zone
-        driveBackwardTimed(0.25, 1600);
+        driveBackwardTimed(0.25, 1100);
         sleep(1000);
 
-        driveForwardtimed(0.25, 500);
-        //turn to shooting angle
-        turnToHeading(14);
+        driveForwardtimed(0.3,300);
+
+        //  turn to shooting angle
+        turnLeft(0.3,225);
 
         //launch artifacts
         launchArtifacts();
@@ -101,7 +101,7 @@ public class AutoBlueFar extends LinearOpMode {
         // double startX = odo.getPosition().getX(DistanceUnit.MM);
         //strafeToX(startX + 5.0, 0.3); // strafe right
 
-        driveForwardtimed(0.2, 3000);
+        driveForwardtimed(0.3, 2000);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
@@ -116,13 +116,9 @@ public class AutoBlueFar extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // timeout
-            if (System.currentTimeMillis() - startTime > timeout) {
-                telemetry.addLine("Timeout: moving on to next step");
-                telemetry.update();
-                break;
-            }
-
+        /*     if (robot.getOdoPositionY(DistanceUnit.MM)> targetY &&
+                     System.currentTimeMillis() - startTime > timeout){
+             }*/
 
             double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
@@ -218,13 +214,13 @@ public class AutoBlueFar extends LinearOpMode {
         drive.stop();
     }
 
-    private void strafeToX(double targetXInches, double basePower) {
+    private void strafeToX(double targetXMM, double basePower) {
 
         Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
         double currentX = startPos.getX(DistanceUnit.MM);
-        double error = targetXInches - currentX;
+        double error = targetXMM - currentX;
         double direction = Math.signum(error);
 
         telemetry.addLine("Strafe Started");
@@ -236,7 +232,7 @@ public class AutoBlueFar extends LinearOpMode {
 
             currentX = pos.getX(DistanceUnit.MM);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
-            error = targetXInches - currentX;
+            error = targetXMM - currentX;
 
             // Stop when close enough
             if (Math.abs(error) < 0.5) break;
@@ -261,7 +257,7 @@ public class AutoBlueFar extends LinearOpMode {
             robot.fr_motor.setPower(frPower);
             robot.br_motor.setPower(-brPower);
 
-            telemetry.addData("Target X (in)", targetXInches);
+            telemetry.addData("Target X (in)", targetXMM);
             telemetry.addData("Current X (in)", currentX);
             telemetry.addData("Remaining Distance (in)", "%.2f", error);
             telemetry.addData("Heading", "%.2f", currentHeading);
@@ -281,18 +277,26 @@ public class AutoBlueFar extends LinearOpMode {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
         shooter.startShootingFar();
-        sleep(1000);
+        sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
         artifactPusherArtifacts.startWheel();
-        sleep(1000);
+        sleep(1500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
-        sleep(1500);
+        sleep(500);
+
+        intake.stopPushing();
+        artifactPusherArtifacts.stopPushing();
+        sleep(1750);
+
+        intake.startPushing();
+        artifactPusherArtifacts.startWheel();
+        sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");
         telemetry.update();
@@ -345,4 +349,24 @@ public class AutoBlueFar extends LinearOpMode {
         robot.br_motor.setPower(-power);
 
     }
+    private void turnRight(double power, long timeMs) {
+        robot.fr_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+        robot.fl_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+
+        sleep(timeMs);
+        robot.stopAllMotors();
+    }
+
+    private void turnLeft(double power, long timeMs) {
+        robot.fr_motor.setPower(power);
+        robot.br_motor.setPower(power);
+        robot.fl_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+
+        sleep(timeMs);
+        robot.stopAllMotors();
+    }
+
 }

@@ -70,20 +70,23 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
 
-        // Move forward to shooting position
-        driveBackwardTimed(0.3,2350);
+        // Move forward to shooting position,2800
+        driveBackwardTimed(0.3,2800);
 
         // Launch artifacts
         launchArtifacts();
 
         driveForwardtimed(0.3,500);
 
-        turnToHeading(135);
+        //1500
+        turnLeft(0.3,1800);
+       // turnToHeading(135);
 
         startIntake();
 
         // go forward
-        moveBackwardsToYTarget(-25);
+        driveBackwardTimed(0.3,2000);
+       // moveBackwardsToYTarget(-50);
 
         sleep(1000);
         driveForwardtimed(0.3,1950);
@@ -96,7 +99,7 @@ public class AutoRedClose extends LinearOpMode {
      //   startX = odo.getPosition().getX(DistanceUnit.INCH);
      //   strafeToX(startX + 6, 0.3); // strafe right
 
-        turnToHeading(0);
+        turnRight(0.3,1800);
 
         driveBackwardTimed(0.3,500);
 
@@ -190,10 +193,11 @@ public class AutoRedClose extends LinearOpMode {
         double currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double error = targetHeading - currentHeading;
 
+
         // Normalize error to range -180 to +180
         error = ((error + 180) % 360) - 180;
 
-        while (opModeIsActive() && Math.abs(error) > 1.0) {
+        while (opModeIsActive() && error > 1.0) {
             odo.update();
             currentHeading = odo.getPosition().getHeading(AngleUnit.DEGREES);
             error = targetHeading - currentHeading;
@@ -281,18 +285,26 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
         shooter.startShootingClose();
-        sleep(1000);
+        sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
         artifactPusherArtifacts.startWheel();
-        sleep(2500);
+        sleep(1500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
-        sleep(1500);
+        sleep(500);
+
+        intake.stopPushing();
+        artifactPusherArtifacts.stopPushing();
+        sleep(1750);
+
+        intake.startPushing();
+        artifactPusherArtifacts.startWheel();
+        sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");
         telemetry.update();
@@ -344,5 +356,24 @@ public class AutoRedClose extends LinearOpMode {
         robot.bl_motor.setPower(-power);
         robot.br_motor.setPower(-power);
 
+    }
+    private void turnRight(double power, long timeMs) {
+        robot.fr_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+        robot.fl_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+
+        sleep(timeMs);
+        robot.stopAllMotors();
+    }
+
+    private void turnLeft(double power, long timeMs) {
+        robot.fr_motor.setPower(power);
+        robot.br_motor.setPower(power);
+        robot.fl_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+
+        sleep(timeMs);
+        robot.stopAllMotors();
     }
 }
