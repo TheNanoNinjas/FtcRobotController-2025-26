@@ -8,7 +8,7 @@ public class Shooter {
     //Autonomous long rangshooting working well with 0.58 power.
     private static double LONG_RANGE_POWER = 0.68257;
     private static double SHORT_RANGE_POWER = 0.56;
-    private static double AUTO_SHORT_POWER = 0.6;
+    private static double AUTO_SHORT_POWER = 0.53;
 
     private static double MANUAL_INTAKE_POWER = -0.5;
 

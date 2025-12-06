@@ -79,8 +79,8 @@ public class AutoBlueClose extends LinearOpMode {
         driveForwardtimed(0.3,500);
 
         //1500
-        turnRight(0.3,1600);
-        // turnToHeading(135);
+       turnRight(0.3,1350);
+      //   turnToHeading(135);
 
         startIntake();
 
@@ -99,15 +99,16 @@ public class AutoBlueClose extends LinearOpMode {
         //   startX = odo.getPosition().getX(DistanceUnit.INCH);
         //   strafeToX(startX + 6, 0.3); // strafe right
 
-        turnLeft(0.3,1800);
-
-        driveBackwardTimed(0.3,500);
+        //1800
+        turnLeft(0.3,1400);
+//500
+        driveBackwardTimed(0.3,300);
 
         launchArtifacts();
 
         turnToHeading(63);
 
-        driveBackwardTimed(0.3,1000);
+        driveForwardtimed(0.35,700);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
@@ -284,7 +285,7 @@ public class AutoBlueClose extends LinearOpMode {
     private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
-        shooter.startShootingClose();
+        shooter.startShootingAutoClose();
         sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");
@@ -300,7 +301,7 @@ public class AutoBlueClose extends LinearOpMode {
 
         intake.stopPushing();
         artifactPusherArtifacts.stopPushing();
-        sleep(1750);
+        sleep(2500);
 
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
