@@ -5,10 +5,12 @@ import org.firstinspires.ftc.teamcode.util.RobotHardware;
 public class Shooter {
     private RobotHardware robot;
 
-    //Autonomous long rangshooting working well with 0.58 power.
-    private static double LONG_RANGE_POWER = 0.68257;
+    //Autonomous long rangshooting working well with 0.67 power.
+    private static double LONG_RANGE_POWER = 0.662;
     private static double SHORT_RANGE_POWER = 0.56;
+    //535
     private static double AUTO_SHORT_POWER = 0.53;
+    private static double AUTO_LONG_POWER = 0.65;
 
     private static double MANUAL_INTAKE_POWER = -0.5;
 
@@ -16,8 +18,6 @@ public class Shooter {
     public Shooter(RobotHardware robot) {
         this.robot = robot;
     }
-
-
 
     public void startShootingFar() {
         robot.leftShooter.setPower(LONG_RANGE_POWER);
@@ -27,6 +27,11 @@ public class Shooter {
     public void startShootingAutoClose(){
         robot.leftShooter.setPower(AUTO_SHORT_POWER);
         robot.rightShooter.setPower((AUTO_SHORT_POWER));
+    }
+    public void startShootingAutoFar(){
+        robot.leftShooter.setPower(AUTO_LONG_POWER);
+        robot.rightShooter.setPower(AUTO_LONG_POWER);
+
     }
 
     public void manualIntakeShooter() {

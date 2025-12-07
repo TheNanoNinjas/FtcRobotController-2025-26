@@ -56,7 +56,7 @@ public class AutoBlueFar extends LinearOpMode {
         driveForwardtimed(0.3,400);
 
         // Turn to shooting angle
-        turnLeft(0.3,300);
+        turnLeft(0.3,225);
 
         // Launch artifacts
         launchArtifacts();
@@ -65,10 +65,10 @@ public class AutoBlueFar extends LinearOpMode {
         turnRight(0.3,395);
 
         // go forward
-        driveForwardtimed(0.3,1200);
+        driveForwardtimed(0.3,2000);
 
         //turn to intake earlier value was 100
-        turnRight(0.3,1200);
+     /*   turnRight(0.3,1200);
 
         sleep(500);
 
@@ -77,7 +77,7 @@ public class AutoBlueFar extends LinearOpMode {
 
         //go forward to intake, earlier value was 810
         driveBackwardTimed(0.3,2350);
-
+        startIntake();
         //move backwards after intake, earlier time was 2350
         driveForwardtimed(0.3, 2050);
 
@@ -102,7 +102,7 @@ public class AutoBlueFar extends LinearOpMode {
         //strafeToX(startX + 5.0, 0.3); // strafe right
 
         driveForwardtimed(0.3, 2000);
-
+*/
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
         drive.stop();
@@ -276,7 +276,7 @@ public class AutoBlueFar extends LinearOpMode {
     private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
-        shooter.startShootingFar();
+        shooter.startShootingAutoFar();
         sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");

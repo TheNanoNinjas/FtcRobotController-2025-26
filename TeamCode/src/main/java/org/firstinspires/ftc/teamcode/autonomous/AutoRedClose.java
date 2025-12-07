@@ -70,16 +70,16 @@ public class AutoRedClose extends LinearOpMode {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
 
-        // Move forward to shooting position,2800
-        driveBackwardTimed(0.3,2800);
+        // Move forward to shooting position,2200
+        driveBackwardTimed(0.3,1500);
 
         // Launch artifacts
         launchArtifacts();
 
-        driveForwardtimed(0.3,500);
+        driveForwardtimed(0.3,200);
 
         //1500
-        turnLeft(0.3,1800);
+        turnLeft(0.3,1350);
        // turnToHeading(135);
 
         startIntake();
@@ -87,7 +87,7 @@ public class AutoRedClose extends LinearOpMode {
         // go forward
         driveBackwardTimed(0.3,2000);
        // moveBackwardsToYTarget(-50);
-
+    startIntake();
         sleep(1000);
         driveForwardtimed(0.3,1950);
 

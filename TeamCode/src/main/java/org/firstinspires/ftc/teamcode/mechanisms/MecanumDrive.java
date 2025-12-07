@@ -12,7 +12,7 @@ public class MecanumDrive {
     }
 
     public void mecanumDrive(double drive, double strafe, double turn) {
-        double powerScale = 0.40;
+        double powerScale = 0.45;
 
         double leftFrontPower = (drive + strafe + turn) * powerScale;
         double rightFrontPower = (drive - strafe - turn) * powerScale;

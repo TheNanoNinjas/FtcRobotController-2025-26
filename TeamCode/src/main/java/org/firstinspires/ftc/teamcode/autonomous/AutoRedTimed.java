@@ -56,16 +56,16 @@ public class AutoRedTimed extends LinearOpMode {
         driveForwardtimed(0.3,400);
 
         // Turn to shooting angle
-        turnRight(0.3,300);
+        turnRight(0.3,225);
 
         // Launch artifacts
         launchArtifacts();
 
         //turn back to 0, last value was 3
-        turnLeft(0.3,395);
+        turnLeft(0.3,300);
 
         // go forward
-        driveForwardtimed(0.3,1450);
+        driveForwardtimed(0.3,1000);
 
         //turn to intake earlier value was 100
         turnLeft(0.3,1200);
@@ -277,7 +277,7 @@ public class AutoRedTimed extends LinearOpMode {
     private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
-        shooter.startShootingFar();
+        shooter.startShootingAutoFar();
         sleep(1500);
 
         telemetry.addLine("Starting artifact pusher wheel");

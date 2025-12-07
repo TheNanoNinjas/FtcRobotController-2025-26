@@ -79,7 +79,7 @@ public class AutoRedFar extends LinearOpMode {
 
         //go forward to intake, earlier value was 810
         moveBackwardsToYTarget(780);
-
+startIntake();
        sleep(750);
 
         //move backwards after intake, earlier time was 2350
