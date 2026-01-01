@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -57,6 +58,8 @@ public class RobotHardware {
         // Set shooter direction
         leftShooter.setDirection(DcMotor.Direction.REVERSE);
 
+        wheelMotor.setDirection(DcMotor.Direction.REVERSE);
+
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -104,12 +107,6 @@ public class RobotHardware {
         odo.update();
        return odo.getPosition();
     }
-
-
-
-
-
-
 
     public void setDrivePower(double fl, double fr, double bl, double br) {
         fl_motor.setPower(fl);
