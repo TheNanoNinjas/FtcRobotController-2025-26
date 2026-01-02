@@ -124,7 +124,11 @@ OpModeTest extends OpMode {
         } else if (gamepad2.left_trigger > 0)
         {
             artifactPusher.reversePush();
-        } else if (gamepad1.left_bumper) {
+
+        } else if (gamepad1.right_bumper) {
+            artifactPusher.startWheelIntaker();
+
+        }else if (gamepad1.left_bumper) {
             intake.startPushing();
 
         } else if (gamepad2.dpad_up) {

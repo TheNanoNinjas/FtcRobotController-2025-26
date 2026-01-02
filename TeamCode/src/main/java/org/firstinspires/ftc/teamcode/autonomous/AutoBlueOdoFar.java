@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Blue Alliance Timed Far", group = "Competition")
+@Autonomous(name = "Auto Blue Alliance ODO Far", group = "Competition")
 @Disabled
-public class AutoBlueFar extends LinearOpMode {
+public class AutoBlueOdoFar extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
@@ -55,55 +55,13 @@ public class AutoBlueFar extends LinearOpMode {
         telemetry.update();
 
         // Move forward to shooting position
-        driveForwardtimed(0.3,400);
+        moveToYTarget(25);
 
-        // Turn to shooting angle
-        turnLeft(0.3,190);
+
 
         // Launch artifacts
         launchArtifacts();
 
-        //turn back to 0, last value was 395
-        turnRight(0.3,320);
-
-        // go forward
-        driveForwardtimed(0.3,1500);
-
-        //turn to intake earlier value was 100
-        turnRight(0.3,900);
-
-        sleep(500);
-
-        //start intaking
-        startIntake();
-
-        //go forward to intake, earlier value was 810
-        driveBackwardTimed(0.3,2350);
-        startIntake();
-        //move backwards after intake, earlier time was 2350
-        driveForwardtimed(0.3, 2050);
-
-        stopIntake();
-
-        //turn back to 0, earlier value is 4
-        turnLeft(0.3,1000);
-
-        //move backwards to shooting zone
-        driveBackwardTimed(0.25, 1500);
-        sleep(1000);
-
-        driveForwardtimed(0.3,300);
-
-        //  turn to shooting angle
-        turnLeft(0.3,190);
-
-        //launch artifacts
-        launchArtifacts();
-
-        // double startX = odo.getPosition().getX(DistanceUnit.MM);
-        //strafeToX(startX + 5.0, 0.3); // strafe right
-
-        driveForwardtimed(0.3, 2000);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
@@ -122,7 +80,7 @@ public class AutoBlueFar extends LinearOpMode {
                      System.currentTimeMillis() - startTime > timeout){
              }*/
 
-            double y = robot.getOdoPositionY(DistanceUnit.MM);
+            double y = robot.getOdoPositionY(DistanceUnit.INCH);
             double error = targetY - y;
 
             double drivePower = 0.25;
@@ -162,7 +120,7 @@ public class AutoBlueFar extends LinearOpMode {
             }
 
 
-            double y = robot.getOdoPositionY(DistanceUnit.MM);
+            double y = robot.getOdoPositionY(DistanceUnit.INCH);
             double error = targetY - y;
 
             double drivePower = 0.35;
@@ -216,13 +174,13 @@ public class AutoBlueFar extends LinearOpMode {
         drive.stop();
     }
 
-    private void strafeToX(double targetXMM, double basePower) {
+    private void strafeToX(double targetXIN, double basePower) {
 
         Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
-        double currentX = startPos.getX(DistanceUnit.MM);
-        double error = targetXMM - currentX;
+        double currentX = startPos.getX(DistanceUnit.INCH);
+        double error = targetXIN - currentX;
         double direction = Math.signum(error);
 
         telemetry.addLine("Strafe Started");
@@ -232,9 +190,9 @@ public class AutoBlueFar extends LinearOpMode {
 
             Pose2D pos = robot.getOdoPosition();
 
-            currentX = pos.getX(DistanceUnit.MM);
+            currentX = pos.getX(DistanceUnit.INCH);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
-            error = targetXMM - currentX;
+            error = targetXIN - currentX;
 
             // Stop when close enough
             if (Math.abs(error) < 0.5) break;
@@ -259,7 +217,7 @@ public class AutoBlueFar extends LinearOpMode {
             robot.fr_motor.setPower(frPower);
             robot.br_motor.setPower(-brPower);
 
-            telemetry.addData("Target X (in)", targetXMM);
+            telemetry.addData("Target X (in)", targetXIN);
             telemetry.addData("Current X (in)", currentX);
             telemetry.addData("Remaining Distance (in)", "%.2f", error);
             telemetry.addData("Heading", "%.2f", currentHeading);

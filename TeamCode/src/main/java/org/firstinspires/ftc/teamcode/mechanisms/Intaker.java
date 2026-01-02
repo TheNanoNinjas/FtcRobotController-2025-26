@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import static java.lang.Thread.sleep;
+
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 public class Intaker {
@@ -10,8 +12,14 @@ public class Intaker {
     }
 
     public void startPushing() {
-        robot.intakeMotor.setPower(1.0);
+        robot.intakeMotor.setPower(0.85);
     }
+
+    public void startPushingAuto(long timeMS) throws InterruptedException {
+        robot.intakeMotor.setPower(1.0);
+        sleep(timeMS);
+    }
+
 
     public void stopPushing() {
         robot.intakeMotor.setPower(0.0);
