@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,9 +13,9 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Blue Alliance ODO Far", group = "Competition")
-@Disabled
-public class AutoBlueOdoFar extends LinearOpMode {
+@Autonomous(name = "Auto Red Alliance Far", group = "Competition")
+
+public class AutoBlueFarTrial extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
@@ -25,13 +23,13 @@ public class AutoBlueOdoFar extends LinearOpMode {
     private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
 
-    // private GoBildaPinpointDriver odo;
-    // private Rev2mDistanceSensor distanceSensor;
+   // private GoBildaPinpointDriver odo;
+   // private Rev2mDistanceSensor distanceSensor;
 
     private static final double KP = 0.05;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         // Initialize hardware and mechanisms
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
@@ -50,18 +48,61 @@ public class AutoBlueOdoFar extends LinearOpMode {
         }
     }
 
-    private void executeAutonomousSequence() throws InterruptedException {
+    private void executeAutonomousSequence() {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
 
         // Move forward to shooting position
-        moveToYTarget(25);
+        moveToYTarget(192);
 
-
+        // Turn to shooting angle
+        turnToHeading(19);
 
         // Launch artifacts
         launchArtifacts();
 
+        //turn back to 0, last value was 3
+        turnToHeading(15);
+
+        // go forward
+        moveToYTarget(810);
+
+        //turn to intake earlier value was 100
+        turnToHeading(287);
+
+        sleep(500);
+
+        //start intaking
+        startIntake();
+
+        //go forward to intake, earlier value was 810
+      //  moveBackwardsToYTarget(800);
+        driveBackwardTimed(0.3,1750);
+startIntake();
+       sleep(750);
+
+        //move backwards after intake, earlier time was 2350
+     driveForwardtimed(0.3,1600);
+        stopIntake();
+
+        //turn back to 0, earlier value is 4
+        turnToHeading(40);
+
+        //move backwards to shooting zone
+        driveBackwardTimed(0.25, 1600);
+        sleep(1000);
+
+        moveToYTarget(500);
+        //turn to shooting angle
+            turnToHeading(180);
+
+        //launch artifacts
+        launchArtifacts();
+
+        // double startX = odo.getPosition().getX(DistanceUnit.MM);
+        //strafeToX(startX + 5.0, 0.3); // strafe right
+
+        driveForwardtimed(0.2, 3000);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
@@ -78,9 +119,11 @@ public class AutoBlueOdoFar extends LinearOpMode {
 
         /*     if (robot.getOdoPositionY(DistanceUnit.MM)> targetY &&
                      System.currentTimeMillis() - startTime > timeout){
+
+
              }*/
 
-            double y = robot.getOdoPositionY(DistanceUnit.INCH);
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
 
             double drivePower = 0.25;
@@ -97,7 +140,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
             telemetry.addData("Timeout", (System.currentTimeMillis() - startTime) + " / " + timeout);
             telemetry.update();
 
-            if (error < 0) break;
+            if (error < 2) break;
         }
 
         drive.stop();
@@ -120,7 +163,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
             }
 
 
-            double y = robot.getOdoPositionY(DistanceUnit.INCH);
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
             double error = targetY - y;
 
             double drivePower = 0.35;
@@ -136,7 +179,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
             telemetry.addData("Drive Power", drivePower);
             telemetry.update();
 
-            if (error < 0) break;
+            if (error < 2) break;
         }
         drive.stop();
         telemetry.addLine("Y target reached");
@@ -174,13 +217,13 @@ public class AutoBlueOdoFar extends LinearOpMode {
         drive.stop();
     }
 
-    private void strafeToX(double targetXIN, double basePower) {
+    private void strafeToX(double targetXMM, double basePower) {
 
         Pose2D startPos = robot.getOdoPosition();
         double startHeading = startPos.getHeading(AngleUnit.DEGREES);
 
-        double currentX = startPos.getX(DistanceUnit.INCH);
-        double error = targetXIN - currentX;
+        double currentX = startPos.getX(DistanceUnit.MM);
+        double error = targetXMM - currentX;
         double direction = Math.signum(error);
 
         telemetry.addLine("Strafe Started");
@@ -190,9 +233,9 @@ public class AutoBlueOdoFar extends LinearOpMode {
 
             Pose2D pos = robot.getOdoPosition();
 
-            currentX = pos.getX(DistanceUnit.INCH);
+            currentX = pos.getX(DistanceUnit.MM);
             double currentHeading = pos.getHeading(AngleUnit.DEGREES);
-            error = targetXIN - currentX;
+            error = targetXMM - currentX;
 
             // Stop when close enough
             if (Math.abs(error) < 0.5) break;
@@ -217,7 +260,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
             robot.fr_motor.setPower(frPower);
             robot.br_motor.setPower(-brPower);
 
-            telemetry.addData("Target X (in)", targetXIN);
+            telemetry.addData("Target X (in)", targetXMM);
             telemetry.addData("Current X (in)", currentX);
             telemetry.addData("Remaining Distance (in)", "%.2f", error);
             telemetry.addData("Heading", "%.2f", currentHeading);
@@ -233,11 +276,11 @@ public class AutoBlueOdoFar extends LinearOpMode {
         telemetry.update();
     }
 
-    private void launchArtifacts() throws InterruptedException {
+    private void launchArtifacts() {
         telemetry.addLine("Starting shooter motors");
         telemetry.update();
-        shooter.startShootingAutoFar();
-        sleep(1500);
+        shooter.startShootingFar();
+        sleep(1000);
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
@@ -246,16 +289,9 @@ public class AutoBlueOdoFar extends LinearOpMode {
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
-        intake.startPushingAuto(750);
-        sleep(500);
-
-        intake.stopPushing();
-        artifactPusherArtifacts.stopPushing();
-        sleep(1500);
-
         intake.startPushing();
         artifactPusherArtifacts.startWheel();
-        sleep(1100);
+        sleep(1500);
 
         telemetry.addLine("Stopping all launch mechanisms");
         telemetry.update();
@@ -308,24 +344,4 @@ public class AutoBlueOdoFar extends LinearOpMode {
         robot.br_motor.setPower(-power);
 
     }
-    private void turnRight(double power, long timeMs) {
-        robot.fr_motor.setPower(-power);
-        robot.br_motor.setPower(-power);
-        robot.fl_motor.setPower(power);
-        robot.bl_motor.setPower(power);
-
-        sleep(timeMs);
-        robot.stopAllMotors();
-    }
-
-    private void turnLeft(double power, long timeMs) {
-        robot.fr_motor.setPower(power);
-        robot.br_motor.setPower(power);
-        robot.fl_motor.setPower(-power);
-        robot.bl_motor.setPower(-power);
-
-        sleep(timeMs);
-        robot.stopAllMotors();
-    }
-
 }

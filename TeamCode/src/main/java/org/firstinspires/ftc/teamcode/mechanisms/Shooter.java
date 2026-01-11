@@ -5,10 +5,10 @@ import org.firstinspires.ftc.teamcode.util.RobotHardware;
 public class Shooter {
     private RobotHardware robot;
 
-    //long rangshooting working well with 0.75 power.
-    private static double LONG_RANGE_POWER = 0.61;
-    //0.58
-    private static double SHORT_RANGE_POWER = 0.53;
+    //long rangshooting working well with 0.61 power.
+    private static double LONG_RANGE_POWER = 0.58;
+    //0.53
+    private static double SHORT_RANGE_POWER = 0.51;
     //535
     private static double AUTO_SHORT_POWER = 0.53;
     private static double AUTO_LONG_POWER = 0.71;

@@ -14,7 +14,7 @@ public class ArtifactPusher {
         robot.wheelMotor.setPower(.75);
     }
 
-    public void startWheelIntaker(){robot.wheelMotor.setPower(0.65);}
+    public void startWheelIntaker(){robot.wheelMotor.setPower(0.5);}
 
     public void stopPushing() {
         robot.wheelMotor.setPower(0.0);
