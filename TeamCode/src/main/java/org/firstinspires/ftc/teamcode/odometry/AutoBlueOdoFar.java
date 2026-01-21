@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -14,9 +15,10 @@ import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
 @Autonomous(name = "Auto Blue ODO Far ", group = "Competition")
+@Disabled
 public class AutoBlueOdoFar extends LinearOpMode {
 
-    private RobotHardware robot = new RobotHardware();
+    private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
     private ArtifactPusher pusher;
@@ -35,7 +37,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        pusher = new ArtifactPusher(robot);
+        pusher = new ArtifactPusher(robot,shooter);
         intake = new Intaker(robot);
 
         telemetry.addLine("Initialized");
@@ -74,6 +76,8 @@ public class AutoBlueOdoFar extends LinearOpMode {
         turnToHeading(15);
 
         launchArtifacts();
+
+
 
     }
 
@@ -260,7 +264,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
         shooter.startShootingFar();
         sleep(1500);
 
-        pusher.startWheel();
+        pusher.wait();
         sleep(800);
 
         intake.startPushingAuto(700);

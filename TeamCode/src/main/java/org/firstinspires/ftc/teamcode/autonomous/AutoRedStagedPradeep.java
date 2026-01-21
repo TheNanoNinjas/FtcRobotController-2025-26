@@ -40,8 +40,8 @@ public class AutoRedStagedPradeep extends OpMode {
     private static final double OBSTACLE_DISTANCE = 6.0;
 
     private static int STAGE = 1;
-    private ElapsedTime stageTimer = new ElapsedTime();
-    private double remainingTurnAngle = 0;
+    private final ElapsedTime stageTimer = new ElapsedTime();
+    private final double remainingTurnAngle = 0;
     private boolean turnInitialized = false;
 
     @Override
@@ -49,7 +49,7 @@ public class AutoRedStagedPradeep extends OpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+     //   artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
         
         initializeSensors();
@@ -194,10 +194,10 @@ public class AutoRedStagedPradeep extends OpMode {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
         } else if (stageTimer.seconds() < 2.0) {
-            artifactPusherArtifacts.startWheel();
+//artifactPusherArtifacts.startWheel();
         } else if (stageTimer.seconds() < 4.0) {
             intake.startPushing();
-            artifactPusherArtifacts.startWheel();
+      //      artifactPusherArtifacts.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();

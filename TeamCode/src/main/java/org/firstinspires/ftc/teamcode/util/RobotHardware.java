@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,15 +10,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.autonomous.GoBildaPinpointDriver;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RobotHardware {
     // Drive Motors
@@ -28,10 +22,11 @@ public class RobotHardware {
     public DcMotor br_motor;
 
     // Mechanism Motors
-    public DcMotor leftShooter;
-    public DcMotor rightShooter;
+    public DcMotorEx leftShooter;
+    public DcMotorEx rightShooter;
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
+
 
     //Sensors
     private GoBildaPinpointDriver odo;
@@ -49,17 +44,15 @@ public class RobotHardware {
         fl_motor.setDirection(DcMotor.Direction.REVERSE);
         bl_motor.setDirection(DcMotor.Direction.REVERSE);
 
-
         // Mechanism Motors
-        leftShooter = hardwareMap.get(DcMotor.class, "leftShooter");
-        rightShooter = hardwareMap.get(DcMotor.class, "rightShooter");
+        leftShooter = hardwareMap.get(DcMotorEx.class, "leftShooter");
+        rightShooter = hardwareMap.get(DcMotorEx.class, "rightShooter");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         wheelMotor = hardwareMap.get(DcMotor.class, "wheelMotor");
         // Set shooter direction
-        leftShooter.setDirection(DcMotor.Direction.REVERSE);
+        rightShooter.setDirection(DcMotor.Direction.REVERSE);
 
         wheelMotor.setDirection(DcMotor.Direction.REVERSE);
-
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;

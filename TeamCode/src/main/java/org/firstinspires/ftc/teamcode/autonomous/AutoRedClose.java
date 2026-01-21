@@ -35,7 +35,7 @@ public class AutoRedClose extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+     //   artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
 
@@ -289,13 +289,13 @@ public class AutoRedClose extends LinearOpMode {
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
-        artifactPusherArtifacts.startWheel();
+   //     artifactPusherArtifacts.startWheel();
         sleep(1500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+ //       artifactPusherArtifacts.startWheel();
         sleep(500);
 
         intake.stopPushing();
@@ -303,7 +303,7 @@ public class AutoRedClose extends LinearOpMode {
         sleep(1750);
 
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+  //      artifactPusherArtifacts.startWheel();
         sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");

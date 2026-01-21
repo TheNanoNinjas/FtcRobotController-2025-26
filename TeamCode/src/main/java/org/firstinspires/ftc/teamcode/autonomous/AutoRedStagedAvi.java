@@ -40,14 +40,14 @@ public class AutoRedStagedAvi extends OpMode {
     private static final double OBSTACLE_DISTANCE = 6.0;
 
     private static int STAGE = 1;
-    private ElapsedTime stageTimer = new ElapsedTime();
+    private final ElapsedTime stageTimer = new ElapsedTime();
 
     @Override
     public void init() {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+     //   artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
         initializeSensors();
@@ -250,10 +250,10 @@ public class AutoRedStagedAvi extends OpMode {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
         } else if (stageTimer.seconds() < 2.0) {
-            artifactPusherArtifacts.startWheel();
+       //     artifactPusherArtifacts.startWheel();
         } else if (stageTimer.seconds() < 4.0) {
             intake.startPushing();
-            artifactPusherArtifacts.startWheel();
+         //   artifactPusherArtifacts.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();
@@ -270,10 +270,10 @@ public class AutoRedStagedAvi extends OpMode {
         if (stageTimer.seconds() < 1.0) {
             shooter.startShootingFar();
         } else if (stageTimer.seconds() < 2.0) {
-            artifactPusherArtifacts.startWheel();
+         //   artifactPusherArtifacts.startWheel();
         } else if (stageTimer.seconds() < 4.0) {
             intake.startPushing();
-            artifactPusherArtifacts.startWheel();
+          //  artifactPusherArtifacts.startWheel();
         } else {
             shooter.stopShooting();
             intake.stopPushing();

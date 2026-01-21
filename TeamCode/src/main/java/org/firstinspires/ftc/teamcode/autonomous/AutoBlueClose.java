@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
 @Autonomous(name = "Auto Blue Alliance Close", group = "Competition")
+@Disabled
 public class AutoBlueClose extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
@@ -35,7 +36,7 @@ public class AutoBlueClose extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+       // artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
 
@@ -288,13 +289,13 @@ public class AutoBlueClose extends LinearOpMode {
 
         telemetry.addLine("Starting artifact pusher wheel");
 
-        artifactPusherArtifacts.startWheel();
+        //artifactPusherArtifacts.startWheel();
         sleep(1500);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+       // artifactPusherArtifacts.startWheel();
         sleep(500);
 
         intake.stopPushing();
@@ -302,7 +303,7 @@ public class AutoBlueClose extends LinearOpMode {
         sleep(2500);
 
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+     //   artifactPusherArtifacts.startWheel();
         sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");

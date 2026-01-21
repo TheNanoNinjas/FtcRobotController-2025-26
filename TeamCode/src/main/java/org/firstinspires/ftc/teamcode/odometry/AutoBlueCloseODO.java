@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
@@ -13,201 +13,282 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Blue ODO Close ", group = "Competition")
+@Autonomous(name = "Auto Blue Alliance Close ODO", group = "Competition")
+
 public class AutoBlueCloseODO extends LinearOpMode {
 
-    private RobotHardware robot = new RobotHardware();
+    private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
-    private ArtifactPusher pusher;
+    private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
 
-    // ===== TUNING CONSTANTS =====
-    private static final double KP_POS = 0.004;
-    private static final double KP_HEADING = 0.015;
+   // private GoBildaPinpointDriver odo;
+    // private Rev2mDistanceSensor distanceSensor;
 
-    private static final double MAX_POWER = 0.35;
-    private static final double POSITION_TOLERANCE = 5; // mm
-    private static final double HEADING_TOLERANCE = 1.0; // degrees
+    private static final double KP = 0.05;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
+        // Initialize hardware and mechanisms
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        pusher = new ArtifactPusher(robot);
+        artifactPusherArtifacts = new ArtifactPusher(robot,shooter);
         intake = new Intaker(robot);
 
-        telemetry.addLine("Initialized");
+
+        telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         waitForStart();
 
-        robot.resetOdo();
-
         if (opModeIsActive()) {
-            runAuto();
+            executeAutonomousSequence();
         }
     }
 
-    private void runAuto() throws InterruptedException {
-// START: (0,0) heading 45°
-
-        /* Move backward at 45° (diagonal) */
-        moveToX(-300, 45);
-        moveToY(-300, 45);
-
-        /* Shoot */
-        launchArtifacts();
-
-        /* Turn */
-        turnToHeading(0);
-
-        /* Move backward (heading 0° -> -Y) */
-        moveToY(-700, 0);
-
-        /* Turn to 270° */
-        turnToHeading(270);
-
-        /* Move backward (heading 270° -> -X) */
-        moveToX(-1100, 270);
-
-        /* Move forward (heading 270° -> +X) */
-        moveToX(-400, 270);
-
-        /* Turn */
-        turnToHeading(0);
-
-        /* Move forward (heading 0° -> +Y) */
-        moveToY(500, 0);
-
-        /* Return to original heading */
-        turnToHeading(45);
+    private void executeAutonomousSequence() {
+        telemetry.addLine("Starting autonomous sequence");
+        telemetry.update();
 
 
+        telemetry.addLine("Autonomous sequence complete");
+        telemetry.update();
+        drive.stop();
+        shooter.stopShooting();
+        intake.stopPushing();
     }
 
-
-
-    private void moveToY(double targetY, double heading) {
+    private void moveToYTarget(double targetY) {
         long startTime = System.currentTimeMillis();
-        long timeout = 6000;
+        long timeout = 6500;  // timeout in milliseconds)
 
         while (opModeIsActive()) {
 
-            if (System.currentTimeMillis() - startTime > timeout) break;
+        /*     if (robot.getOdoPositionY(DistanceUnit.MM)> targetY &&
+                     System.currentTimeMillis() - startTime > timeout){
 
-            Pose2D pose = robot.getOdoPosition();
-            double y = pose.getY(DistanceUnit.MM);
-            double currentHeading = pose.getHeading(AngleUnit.DEGREES);
 
-            double errorY = targetY - y;
-            if (Math.abs(errorY) < POSITION_TOLERANCE) break;
+             }*/
 
-            double drivePower = errorY * KP_POS;
-            drivePower = clip(drivePower);
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
+            double error = targetY - y;
 
-            double headingError = normalizeAngle(heading - currentHeading);
-            double correction = headingError * KP_HEADING;
+            double drivePower = 0.25;
+            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            mecanumDrive(drivePower, 0, correction);
+            drivePower = Math.max(-0.3, Math.min(0.3, drivePower));
+
+            driveForward(drivePower);
 
             telemetry.addData("Target Y", targetY);
             telemetry.addData("Current Y", y);
-            telemetry.addData("Error Y", errorY);
+            telemetry.addData("Error", error);
+            telemetry.addData("Drive Power", drivePower);
+            telemetry.addData("Timeout", (System.currentTimeMillis() - startTime) + " / " + timeout);
             telemetry.update();
+
+            if (error < 2) break;
         }
 
         drive.stop();
+        telemetry.addLine("Y move finished");
+        telemetry.update();
     }
 
-    private void moveToX(double targetX, double heading) {
+
+    private void moveBackwardsToYTarget(double targetY) {
         long startTime = System.currentTimeMillis();
-        long timeout = 6000;
+        long timeout = 5000;  // timeout in milliseconds)
 
         while (opModeIsActive()) {
 
-            if (System.currentTimeMillis() - startTime > timeout) break;
+            // timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                telemetry.addLine("Timeout: moving on to next step");
+                telemetry.update();
+                break;
+            }
+            double y = robot.getOdoPositionY(DistanceUnit.MM);
+            double error = targetY - y;
 
-            Pose2D pose = robot.getOdoPosition();
-            double x = pose.getX(DistanceUnit.MM);
-            double currentHeading = pose.getHeading(AngleUnit.DEGREES);
+            double drivePower = 0.35;
+            if (Math.abs(error) < 6) drivePower = 0.25 + (error * KP);
 
-            double errorX = targetX - x;
-            if (Math.abs(errorX) < POSITION_TOLERANCE) break;
+            drivePower = Math.max(-0.35, Math.min(0.35, drivePower));
 
-            double strafePower = clip(errorX * KP_POS);
+            driveBackward(drivePower);
 
-            double headingError = normalizeAngle(heading - currentHeading);
+            telemetry.addData("Target Y", targetY);
+            telemetry.addData("Current Y", y);
+            telemetry.addData("Error", error);
+            telemetry.addData("Drive Power", drivePower);
+            telemetry.update();
 
-            double correction = clip(headingError * 0.003);
+            if (error < 2) break;
+        }
+        drive.stop();
+        telemetry.addLine("Y target reached");
+        telemetry.update();
+    }
 
-            mecanumDrive(0, strafePower, correction);
+    private void turnToHeading(double targetHeading) {
 
-            telemetry.addData("Target X", targetX);
-            telemetry.addData("Current X", x);
-            telemetry.addData("Error X", errorX);
-            telemetry.addData("Heading", currentHeading);
-            telemetry.addData("Heading Error", headingError);
+        double currentHeading = robot.getOdoHeading(AngleUnit.DEGREES);
+        double error = targetHeading - currentHeading;
+
+        // Normalize error to range -180 to +180
+        error = ((error + 180) % 360) - 180;
+
+        while (opModeIsActive() && Math.abs(error) > 1.0) {
+
+            currentHeading = robot.getOdoHeading(AngleUnit.DEGREES);
+            error = targetHeading - currentHeading;
+            error = ((error + 180) % 360) - 180;
+
+            double turnPower = 0.25 * Math.signum(error);
+
+            // Turn using drive motors
+            robot.fl_motor.setPower(-turnPower);
+            robot.bl_motor.setPower(-turnPower);
+            robot.fr_motor.setPower(turnPower);
+            robot.br_motor.setPower(turnPower);
+
+            telemetry.addData("Target Heading", targetHeading);
+            telemetry.addData("Current Heading", currentHeading);
+            telemetry.addData("Error", error);
             telemetry.update();
         }
 
         drive.stop();
     }
 
+    private void strafeToX(double targetXMM, double basePower) {
 
-    private void turnToHeading(double target) {
+        Pose2D startPos = robot.getOdoPosition();
+        double startHeading = startPos.getHeading(AngleUnit.DEGREES);
+
+        double currentX = startPos.getX(DistanceUnit.MM);
+        double error = targetXMM - currentX;
+        double direction = Math.signum(error);
+
+        telemetry.addLine("Strafe Started");
+        telemetry.update();
+
         while (opModeIsActive()) {
-            double current = robot.getOdoHeading(AngleUnit.DEGREES);
-            double error = normalizeAngle(target - current);
 
-            if (Math.abs(error) < HEADING_TOLERANCE) break;
+            Pose2D pos = robot.getOdoPosition();
 
-            double turnPower = clip(error * 0.01);
+            currentX = pos.getX(DistanceUnit.MM);
+            double currentHeading = pos.getHeading(AngleUnit.DEGREES);
+            error = targetXMM - currentX;
 
-            mecanumDrive(0, 0, turnPower);
+            // Stop when close enough
+            if (Math.abs(error) < 0.5) break;
 
-            telemetry.addData("Target", target);
-            telemetry.addData("Heading", current);
+            // Calculate heading error
+            double headingError = ((startHeading - currentHeading + 180) % 360) - 180;
+
+
+            double correction = 0.02 * headingError;  // tweak 0.02 if needed
+
+            // Base strafe power
+            double strafePower = direction * Math.abs(basePower);
+
+            // Apply heading correction to each side
+            double flPower = strafePower - correction;
+            double blPower = -strafePower - correction;
+            double frPower = -strafePower + correction;
+            double brPower = strafePower + correction;
+
+            robot.fl_motor.setPower(-flPower);
+            robot.bl_motor.setPower(blPower);
+            robot.fr_motor.setPower(frPower);
+            robot.br_motor.setPower(-brPower);
+
+            telemetry.addData("Target X (in)", targetXMM);
+            telemetry.addData("Current X (in)", currentX);
+            telemetry.addData("Remaining Distance (in)", "%.2f", error);
+            telemetry.addData("Heading", "%.2f", currentHeading);
+            telemetry.addData("Heading Error", "%.2f", headingError);
+            telemetry.addData("Correction", "%.2f", correction);
             telemetry.update();
+
+            sleep(20);
         }
-        drive.stop();
+
+        robot.stopAllMotors();
+        telemetry.addLine("Strafe Completed");
+        telemetry.update();
     }
 
-    private void mecanumDrive(double forward, double strafe, double turn) {
-        double fl = forward + strafe - turn;
-        double fr = forward - strafe + turn;
-        double bl = forward - strafe - turn;
-        double br = forward + strafe + turn;
-
-        robot.fl_motor.setPower(clip(fl));
-        robot.fr_motor.setPower(clip(fr));
-        robot.bl_motor.setPower(clip(bl));
-        robot.br_motor.setPower(clip(br));
-    }
-
-    private double clip(double val) {
-        return Math.max(-MAX_POWER, Math.min(MAX_POWER, val));
-    }
-
-    private double normalizeAngle(double angle) {
-        return ((angle + 180) % 360) - 180;
-    }
-
-
-
-    private void launchArtifacts() throws InterruptedException {
+    private void launchArtifacts() {
+        telemetry.addLine("Starting shooter motors");
+        telemetry.update();
         shooter.startShootingClose();
+        sleep(1000);
+
+        telemetry.addLine("Starting artifact pusher wheel");
+        telemetry.update();
+        artifactPusherArtifacts.startArtifactPushing();
+        sleep(1000);
+
+        telemetry.addLine("Starting intake and pusher");
+        telemetry.update();
+        intake.startPushing();
+        artifactPusherArtifacts.startArtifactPushing();
         sleep(1500);
 
-        pusher.startWheel();
-        sleep(800);
-
-        intake.startPushingAuto(700);
-        sleep(600);
-
+        telemetry.addLine("Stopping all launch mechanisms");
+        telemetry.update();
         shooter.stopShooting();
         intake.stopPushing();
-        pusher.stopPushing();
+        artifactPusherArtifacts.stopPushing();
+
+        telemetry.addLine("Artifact launch completed");
+        telemetry.update();
+    }
+
+    private void startIntake() {
+        intake.startPushing();
+    }
+
+    private void stopIntake() {
+        intake.stopPushing();
+
+    }
+
+    private void driveForward(double power) {
+        robot.fl_motor.setPower(power);
+        robot.fr_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+        robot.br_motor.setPower(power);
+    }
+
+    private void driveForwardtimed(double power, long timeMS) {
+        robot.fl_motor.setPower(power);
+        robot.fr_motor.setPower(power);
+        robot.bl_motor.setPower(power);
+        robot.br_motor.setPower(power);
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackwardTimed(double power, long timeMS) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+        sleep(timeMS);
+        robot.stopAllMotors();
+    }
+
+    private void driveBackward(double power) {
+        robot.fl_motor.setPower(-power);
+        robot.fr_motor.setPower(-power);
+        robot.bl_motor.setPower(-power);
+        robot.br_motor.setPower(-power);
+
     }
 }

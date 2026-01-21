@@ -5,14 +5,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 public class MecanumDrive {
-    private RobotHardware robot;
+    private final RobotHardware robot;
 
     public MecanumDrive(RobotHardware robot) {
         this.robot = robot;
     }
 
     public void mecanumDrive(double drive, double strafe, double turn) {
-        double powerScale = 0.45;
+        //.45
+        double powerScale = 0.6;
 
         double leftFrontPower = (drive + strafe + turn) * powerScale;
         double rightFrontPower = (drive - strafe - turn) * powerScale;

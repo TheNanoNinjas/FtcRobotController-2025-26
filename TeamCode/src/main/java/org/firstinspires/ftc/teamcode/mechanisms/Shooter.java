@@ -1,61 +1,99 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 public class Shooter {
-    private RobotHardware robot;
 
-    //long rangshooting working well with 0.61 power.
-    private static double LONG_RANGE_POWER = 0.58;
-    //0.53
-    private static double SHORT_RANGE_POWER = 0.51;
-    //535
-    private static double AUTO_SHORT_POWER = 0.53;
-    private static double AUTO_LONG_POWER = 0.71;
 
-    private static double MANUAL_INTAKE_POWER = -0.5;
+    private final DcMotorEx leftShooter;
+    private final DcMotorEx rightShooter;
+//1900
+    private static final double LONG_RANGE_VELOCITY = 1577  ;
+    //1510
+    private static final double SHORT_RANGE_VELOCITY = 1350;
+    private static final double AUTO_LONG_VELOCITY = 1600;
+    private static final double AUTO_SHORT_VELOCITY = 1300;
 
+
+    private static final double MANUAL_INTAKE_POWER = -0.5;
 
     public Shooter(RobotHardware robot) {
-        this.robot = robot;
+
+
+        leftShooter = (DcMotorEx) robot.leftShooter;
+        rightShooter = (DcMotorEx) robot.rightShooter;
+
+
+        leftShooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightShooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        leftShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
+
+
 
     public void startShootingFar() {
-        robot.leftShooter.setPower(LONG_RANGE_POWER);
-        robot.rightShooter.setPower(LONG_RANGE_POWER);
-    }
-
-    public void startShootingAutoClose(){
-        robot.leftShooter.setPower(AUTO_SHORT_POWER);
-        robot.rightShooter.setPower((AUTO_SHORT_POWER));
-    }
-    public void startShootingAutoFar(){
-        robot.leftShooter.setPower(AUTO_LONG_POWER);
-        robot.rightShooter.setPower(AUTO_LONG_POWER);
-
-    }
-
-    public void manualIntakeShooter() {
-        robot.leftShooter.setPower(MANUAL_INTAKE_POWER);
-        robot.rightShooter.setPower(MANUAL_INTAKE_POWER);
+        leftShooter.setVelocity(LONG_RANGE_VELOCITY);
+        rightShooter.setVelocity(LONG_RANGE_VELOCITY);
     }
 
     public void startShootingClose() {
-        robot.leftShooter.setPower(SHORT_RANGE_POWER);
-        robot.rightShooter.setPower(SHORT_RANGE_POWER);
+        leftShooter.setVelocity(SHORT_RANGE_VELOCITY);
+        rightShooter.setVelocity(SHORT_RANGE_VELOCITY);
+    }
+
+    public void startShootingAutoFar() {
+        leftShooter.setVelocity(AUTO_LONG_VELOCITY);
+        rightShooter.setVelocity(AUTO_LONG_VELOCITY);
+    }
+
+    public void startShootingAutoClose() {
+        leftShooter.setVelocity(AUTO_SHORT_VELOCITY);
+        rightShooter.setVelocity(AUTO_SHORT_VELOCITY);
+    }
+
+    public void manualIntakeShooter() {
+        leftShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftShooter.setPower(MANUAL_INTAKE_POWER);
+        rightShooter.setPower(MANUAL_INTAKE_POWER);
     }
 
     public void stopShooting() {
-        robot.leftShooter.setPower(0.0);
-        robot.rightShooter.setPower(0.0);
+        leftShooter.setVelocity(0);
+        rightShooter.setVelocity(0);
     }
 
-    public void setShooterPower(double power) {
-        robot.leftShooter.setPower(power);
-        robot.rightShooter.setPower(power);
+
+    public boolean isAtVelocity(double targetVelocity) {
+        double leftError = Math.abs(leftShooter.getVelocity() - targetVelocity);
+        double rightError = Math.abs(rightShooter.getVelocity() - targetVelocity);
+        return leftError < 50 && rightError < 50;
     }
 
-    public boolean isRunning() {
-        return robot.leftShooter.getPower() > 0 || robot.rightShooter.getPower() > 0;
+    public boolean isFarShotReady() {
+        return isAtVelocity(LONG_RANGE_VELOCITY);
+    }
+
+    public boolean isCloseShotReady() {
+        return isAtVelocity(SHORT_RANGE_VELOCITY);
+    }
+
+    public double getLeftVelocity() {
+        return leftShooter.getVelocity();
+    }
+
+    public double getRightVelocity() {
+        return rightShooter.getVelocity();
     }
 }

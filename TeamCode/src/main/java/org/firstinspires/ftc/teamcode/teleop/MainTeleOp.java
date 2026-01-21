@@ -26,7 +26,7 @@ public class MainTeleOp extends LinearOpMode {
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
         intake = new Intaker(robot);
-        artifactPusher = new ArtifactPusher(robot);
+     //   artifactPusher = new ArtifactPusher(robot);
 
         robot.logHardwareStatus(telemetry);
         robot.displayPortMapping(telemetry);
@@ -91,7 +91,7 @@ public class MainTeleOp extends LinearOpMode {
 
     private void handlePush(){
         if (gamepad2.cross){
-            artifactPusher.startWheel();
+            artifactPusher.startArtifactPushing();
            // intake.startPushing();
         }else {
             artifactPusher.stopPushing();
@@ -127,7 +127,7 @@ public class MainTeleOp extends LinearOpMode {
     private void releaseArtifacts(){
         if (gamepad2.right_stick_button){
             intake.reversePush();
-            artifactPusher.reversePush();
+            artifactPusher.reverseArtifacts();
         } else {
           //  intake.stopPushing();
             artifactPusher.stopPushing();

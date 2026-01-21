@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,8 +14,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance Far", group = "Competition")
-
+@Autonomous(name = "Auto Blue Alliance Far", group = "Competition")
+@Disabled
 public class AutoBlueFarTrial extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
@@ -23,7 +24,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
     private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
 
-   // private GoBildaPinpointDriver odo;
+    private GoBildaPinpointDriver odo;
    // private Rev2mDistanceSensor distanceSensor;
 
     private static final double KP = 0.05;
@@ -34,7 +35,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+      //  artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
 
@@ -56,7 +57,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
         moveToYTarget(192);
 
         // Turn to shooting angle
-        turnToHeading(19);
+        turnToHeading(15);
 
         // Launch artifacts
         launchArtifacts();
@@ -65,10 +66,10 @@ public class AutoBlueFarTrial extends LinearOpMode {
         turnToHeading(15);
 
         // go forward
-        moveToYTarget(810);
+        moveToYTarget(600);
 
         //turn to intake earlier value was 100
-        turnToHeading(287);
+        turnToHeading(270);
 
         sleep(500);
 
@@ -77,7 +78,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
 
         //go forward to intake, earlier value was 810
       //  moveBackwardsToYTarget(800);
-        driveBackwardTimed(0.3,1750);
+        driveBackwardTimed(0.3,2000);
 startIntake();
        sleep(750);
 
@@ -94,7 +95,7 @@ startIntake();
 
         moveToYTarget(500);
         //turn to shooting angle
-            turnToHeading(180);
+            turnToHeading(345);
 
         //launch artifacts
         launchArtifacts();
@@ -284,13 +285,13 @@ startIntake();
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
-        artifactPusherArtifacts.startWheel();
+      //    artifactPusherArtifacts.startWheel();
         sleep(1000);
 
         telemetry.addLine("Starting intake and pusher");
         telemetry.update();
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+     //   artifactPusherArtifacts.startWheel();
         sleep(1500);
 
         telemetry.addLine("Stopping all launch mechanisms");

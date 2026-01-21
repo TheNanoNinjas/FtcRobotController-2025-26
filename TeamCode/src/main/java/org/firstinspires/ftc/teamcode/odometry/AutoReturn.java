@@ -33,7 +33,7 @@ public class AutoReturn extends LinearOpMode {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+      //  artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
 
@@ -194,7 +194,7 @@ public class AutoReturn extends LinearOpMode {
 
         telemetry.addLine("Starting artifact pusher wheel");
         telemetry.update();
-        artifactPusherArtifacts.startWheel();
+        artifactPusherArtifacts.startArtifactPushing();
         sleep(1000);
 
         telemetry.addLine("Starting intake and pusher");
@@ -207,7 +207,7 @@ public class AutoReturn extends LinearOpMode {
         sleep(1500);
 
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
+        artifactPusherArtifacts.startArtifactPushing();
         sleep(1100);
 
         telemetry.addLine("Stopping all launch mechanisms");

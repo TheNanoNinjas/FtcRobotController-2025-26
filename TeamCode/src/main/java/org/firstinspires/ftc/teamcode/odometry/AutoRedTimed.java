@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.odometry;
 
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -20,7 +19,7 @@ public class AutoRedTimed extends LinearOpMode {
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
-    private ArtifactPusher artifactPusherArtifacts;
+    private ArtifactPusher pusher;
     private Intaker intake;
 
     // private GoBildaPinpointDriver odo;
@@ -29,12 +28,12 @@ public class AutoRedTimed extends LinearOpMode {
     private static final double KP = 0.05;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         // Initialize hardware and mechanisms
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusherArtifacts = new ArtifactPusher(robot);
+        pusher = new ArtifactPusher(robot,shooter);
         intake = new Intaker(robot);
 
 
@@ -48,7 +47,7 @@ public class AutoRedTimed extends LinearOpMode {
         }
     }
 
-    private void executeAutonomousSequence() {
+    private void executeAutonomousSequence() throws InterruptedException {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
 
@@ -60,6 +59,7 @@ public class AutoRedTimed extends LinearOpMode {
 
         // Launch artifacts
         launchArtifacts();
+
 
         //turn back to 0, last value was 3
         turnLeft(0.3,300);
@@ -274,41 +274,18 @@ public class AutoRedTimed extends LinearOpMode {
         telemetry.update();
     }
 
-    private void launchArtifacts() {
-        telemetry.addLine("Starting shooter motors");
-        telemetry.update();
-        shooter.startShootingAutoFar();
-        sleep(1500);
-
-        telemetry.addLine("Starting artifact pusher wheel");
-        telemetry.update();
-        artifactPusherArtifacts.startWheel();
-        sleep(1500);
-
-        telemetry.addLine("Starting intake and pusher");
-        telemetry.update();
+    private void launchArtifacts() throws InterruptedException {
+       //1st cycle
+        shooter.startShootingFar();
+       if (shooter.isFarShotReady()){
+        pusher.startArtifactPushing();
         intake.startPushing();
-        artifactPusherArtifacts.startWheel();
-        sleep(500);
-
-        intake.stopPushing();
-        artifactPusherArtifacts.stopPushing();
-        sleep(1750);
-
-        intake.startPushing();
-        artifactPusherArtifacts.startWheel();
-        sleep(1100);
-
-        telemetry.addLine("Stopping all launch mechanisms");
-        telemetry.update();
-        shooter.stopShooting();
-        intake.stopPushing();
-        artifactPusherArtifacts.stopPushing();
-
-        telemetry.addLine("Artifact launch completed");
-        telemetry.update();
+       } else{
+           shooter.stopShooting();
+           pusher.stopPushing();
+           intake.stopPushing();
+       }
     }
-
     private void startIntake() {
         intake.startPushing();
     }
@@ -350,6 +327,7 @@ public class AutoRedTimed extends LinearOpMode {
         robot.br_motor.setPower(-power);
 
     }
+
     private void turnRight(double power, long timeMs) {
         robot.fr_motor.setPower(-power);
         robot.br_motor.setPower(-power);
@@ -369,5 +347,6 @@ public class AutoRedTimed extends LinearOpMode {
         sleep(timeMs);
         robot.stopAllMotors();
     }
-
 }
+
+

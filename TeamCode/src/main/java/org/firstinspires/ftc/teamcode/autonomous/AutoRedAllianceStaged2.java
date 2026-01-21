@@ -40,7 +40,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
         STOP
     }
 
-    private RobotHardware robot = new RobotHardware();
+    private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
     private Shooter shooter;
     private ArtifactPusher artifactPusher;
@@ -53,7 +53,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
     private static final double TURN_TOLERANCE_DEG = 2.0;
 
     private STAGE currentStage = STAGE.IDLE;
-    private ElapsedTime stageTimer = new ElapsedTime();
+    private final ElapsedTime stageTimer = new ElapsedTime();
 
     @Override
     public void init() {
@@ -61,7 +61,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
 
         drive = new MecanumDrive(robot);
         shooter = new Shooter(robot);
-        artifactPusher = new ArtifactPusher(robot);
+       // artifactPusher = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
         initializeSensors();
@@ -328,10 +328,10 @@ public class AutoRedAllianceStaged2 extends OpMode {
         double t = stageTimer.seconds();
 
         if (t < 1.0) shooter.startShootingFar();
-        else if (t < 2.0) artifactPusher.startWheel();
+        else if (t < 2.0) artifactPusher.startArtifactPushing();
         else if (t < 4.0) {
             intake.startPushing();
-            artifactPusher.startWheel();
+            artifactPusher.startArtifactPushing();
         } else {
             shooter.stopShooting();
             intake.stopPushing();
