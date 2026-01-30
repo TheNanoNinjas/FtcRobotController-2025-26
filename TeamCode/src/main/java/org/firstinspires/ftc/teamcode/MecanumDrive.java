@@ -4,9 +4,11 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 @TeleOp(name = "Field Relative Mecanum Drive", group = "TeleOp")
 public class MecanumDrive extends LinearOpMode {
@@ -19,6 +21,9 @@ public class MecanumDrive extends LinearOpMode {
 
     // IMU
     private IMU imu;
+
+    public MecanumDrive(HardwareMap hardwareMap, Pose2D beginPose) {
+    }
 
     @Override
     public void runOpMode() {
