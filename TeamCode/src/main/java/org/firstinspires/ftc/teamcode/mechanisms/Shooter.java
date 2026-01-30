@@ -10,8 +10,8 @@ public class Shooter {
 
     private final DcMotorEx leftShooter;
     private final DcMotorEx rightShooter;
-//1900
-    private static final double LONG_RANGE_VELOCITY = 1577  ;
+//1577
+    private static final double LONG_RANGE_VELOCITY = 1570  ;
     //1510
     private static final double SHORT_RANGE_VELOCITY = 1350;
     private static final double AUTO_LONG_VELOCITY = 1600;

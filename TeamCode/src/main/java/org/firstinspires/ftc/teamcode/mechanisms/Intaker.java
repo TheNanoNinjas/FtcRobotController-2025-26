@@ -28,7 +28,7 @@ public void startIntakeAuto(double power){
     }
 
     public void reversePush() {
-        robot.intakeMotor.setPower(-0.65);
+        robot.intakeMotor.setPower(-0.58);
     }
 
     public void setPushPower(double power) {
