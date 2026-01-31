@@ -17,7 +17,6 @@
        private Limelight3A Limelight3A;
 
        private IMU imu;
-       private double distance;
 
         @Override
         public void init() {
@@ -48,10 +47,19 @@
 
             if(llResult != null && llResult.isValid()){
                 Pose3D botPose = llResult.getBotpose_MT2();
+                double distance = getDistanceFromTags(llResult.getTa());
+                telemetry.addData("Calculated Distance", distance);
                 telemetry.addData("Target x",llResult.getTx());
                 telemetry.addData("Target y", llResult.getTy());
                 telemetry.addData("Target area", llResult.getTa());
                 telemetry.addData("Yaw", botPose.getOrientation().getYaw());
+                telemetry.addData("Botpose", botPose.toString());
             }
         }
+        public double getDistanceFromTags(double ta){
+double scale = 30665.95;
+double distance = (scale/ta);
+return distance;
+        }
+
     }
