@@ -1,14 +1,22 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.autonomous.GoBildaPinpointDriver;
 
 import com.qualcomm.robotcore.hardware.IMU;
@@ -27,6 +35,7 @@ public class RobotHardware {
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
 
+    private Limelight3A limelight;
 
     //Sensors
     private GoBildaPinpointDriver odo;
@@ -51,15 +60,27 @@ public class RobotHardware {
         wheelMotor = hardwareMap.get(DcMotor.class, "wheelMotor");
         // Set shooter direction
         rightShooter.setDirection(DcMotor.Direction.REVERSE);
-
         wheelMotor.setDirection(DcMotor.Direction.REVERSE);
+
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
+
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+        limelight.pipelineSwitch(8);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                )
+        );
+        imu.initialize(parameters);
 
         //Sensors
         distance_sensor = hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
@@ -143,8 +164,13 @@ public class RobotHardware {
         telemetry.addLine("===================");
     }
 
+
+        public YawPitchRollAngles getOrientation() {
+            return imu.getRobotYawPitchRollAngles();
+        }
+
     public void resetOdo() {
-
-
     }
 }
+
+

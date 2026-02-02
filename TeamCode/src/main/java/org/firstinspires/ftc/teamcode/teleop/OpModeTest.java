@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 
 @TeleOp(name = "OpMode Test")
 public class OpModeTest extends OpMode {
@@ -20,16 +21,24 @@ public class OpModeTest extends OpMode {
     Shooter shooter;
     Intaker intake;
     ArtifactPusher artifactPusher;
+    AprilTagLimelight tagLimelight;
 
     boolean shooterWasReady = false;
 
     @Override
     public void init() {
         robot.init(hardwareMap);
+
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+
+        tagLimelight = new AprilTagLimelight(hardwareMap, robot, null);
+
+        shooter = new Shooter(robot, tagLimelight);
+
         intake = new Intaker(robot);
         artifactPusher = new ArtifactPusher(robot, shooter);
+
+        tagLimelight.start();
     }
 
     @Override
@@ -37,6 +46,7 @@ public class OpModeTest extends OpMode {
         handleDriving();
         handleShooting();
         handleFeeding();
+        tagLimelight.update();
         updateTelemetry();
     }
 
@@ -66,14 +76,14 @@ public class OpModeTest extends OpMode {
         boolean wantsFarShot = gamepad2.left_bumper;
 
         if (wantsCloseShot) {
-            shooter.startShootingClose();
+            shooter.shootTagsClose();
         } else if (wantsFarShot) {
-            shooter.startShootingFar();
+            shooter.shootTagsFar();
         } else if (gamepad2.square || gamepad1.left_bumper) {
             shooter.manualIntakeShooter();
             shooterWasReady = false;
             return;
-        }else {
+        } else {
             shooter.stopShooting();
             shooterWasReady = false;
             return;
@@ -112,14 +122,11 @@ public class OpModeTest extends OpMode {
         else if (gamepad1.right_bumper){
             artifactPusher.startWheelIntake();
         }
-        else if (gamepad2.dpad_up){
+        else if (gamepad2.dpad_up || gamepad1.left_bumper){
             intake.startPushing();
         }
-        else if (gamepad1.left_bumper){
-            intake.startPushing();
-        }else if(gamepad2.right_trigger>0){
+        else if (gamepad2.right_trigger > 0){
             artifactPusher.startArtifactPushing();
-
         }
         else {
             artifactPusher.stopPushing();
@@ -128,9 +135,9 @@ public class OpModeTest extends OpMode {
     }
 
     private void updateTelemetry() {
-        Pose2D pos = robot.getOdoPosition();
         telemetry.addData("Left Shooter Vel", shooter.getLeftVelocity());
         telemetry.addData("Right Shooter Vel", shooter.getRightVelocity());
+        telemetry.addData("Distance Inches", tagLimelight.getDistanceInches());
         telemetry.update();
     }
 

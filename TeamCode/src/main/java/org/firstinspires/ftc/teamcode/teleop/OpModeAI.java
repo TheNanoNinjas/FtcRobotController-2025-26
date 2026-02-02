@@ -87,6 +87,9 @@ public class OpModeAI extends OpMode {
         else if (gamepad2.left_trigger > 0) {
             artifactPusher.reverseArtifacts();
         }
+        else if (gamepad2.right_trigger > 0) {
+            artifactPusher.startArtifactPushing();
+        }
         else if (gamepad1.right_bumper){
             artifactPusher.startWheelIntake();
         }

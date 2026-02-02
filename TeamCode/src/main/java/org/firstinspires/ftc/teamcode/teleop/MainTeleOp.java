@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -18,13 +19,13 @@ public class MainTeleOp extends LinearOpMode {
     Shooter shooter;
     Intaker intake;
     ArtifactPusher artifactPusher;
-
+    private AprilTagLimelight tagLimelight;
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
 
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot, tagLimelight);
         intake = new Intaker(robot);
      //   artifactPusher = new ArtifactPusher(robot);
 

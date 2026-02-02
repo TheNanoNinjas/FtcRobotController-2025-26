@@ -2,29 +2,40 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
+
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 public class Shooter {
 
+    private RobotHardware robot;
+    private AprilTagLimelight tagLimelight;
 
     private final DcMotorEx leftShooter;
     private final DcMotorEx rightShooter;
-//1577
-    private static final double LONG_RANGE_VELOCITY = 1570  ;
+//1570
+    private static final double LONG_RANGE_VELOCITY = 1580  ;
     //1510
-    private static final double SHORT_RANGE_VELOCITY = 1350;
+   private static final double SHORT_RANGE_VELOCITY = 1400;
     private static final double AUTO_LONG_VELOCITY = 1600;
     private static final double AUTO_SHORT_VELOCITY = 1300;
 
+private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 70);
+
+private final double TagVelocityScaleFar = (SHORT_RANGE_VELOCITY / 92 );
+
+private double VelocityTag;
+private double VelocityTagFar;
 
     private static final double MANUAL_INTAKE_POWER = -0.5;
 
-    public Shooter(RobotHardware robot) {
+    public Shooter(RobotHardware robot, AprilTagLimelight tagLimelight) {
+        this.tagLimelight = tagLimelight;
 
 
-        leftShooter = (DcMotorEx) robot.leftShooter;
-        rightShooter = (DcMotorEx) robot.rightShooter;
+        leftShooter = robot.leftShooter;
+        rightShooter = robot.rightShooter;
 
 
         leftShooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -50,6 +61,26 @@ public class Shooter {
         leftShooter.setVelocity(SHORT_RANGE_VELOCITY);
         rightShooter.setVelocity(SHORT_RANGE_VELOCITY);
     }
+    public void shootTagsClose() {
+        double distanceIn = tagLimelight.getDistanceInches();
+        if (distanceIn <= 0) return;
+
+        VelocityTag = TagVelocityScaleShort * distanceIn;
+
+        leftShooter.setVelocity(VelocityTag);
+        rightShooter.setVelocity(VelocityTag);
+    }
+
+    public void shootTagsFar() {
+        double distanceIn = tagLimelight.getDistanceInches();
+        if (distanceIn <= 0) return;
+
+        VelocityTagFar = TagVelocityScaleFar * distanceIn;
+
+        leftShooter.setVelocity(VelocityTagFar);
+        rightShooter.setVelocity(VelocityTagFar);
+    }
+
 
     public void startShootingAutoFar() {
         leftShooter.setVelocity(AUTO_LONG_VELOCITY);
@@ -78,7 +109,7 @@ public class Shooter {
     public boolean isAtVelocity(double targetVelocity) {
         double leftError = Math.abs(leftShooter.getVelocity() - targetVelocity);
         double rightError = Math.abs(rightShooter.getVelocity() - targetVelocity);
-        return leftError < 50 && rightError < 50;
+        return leftError < 150 && rightError < 150;
     }
 
     public boolean isFarShotReady() {

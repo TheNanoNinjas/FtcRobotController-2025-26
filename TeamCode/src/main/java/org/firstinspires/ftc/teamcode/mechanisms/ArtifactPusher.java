@@ -7,7 +7,7 @@ public class ArtifactPusher {
     private final RobotHardware robot;
     private final Shooter shooter;
 //.8
-    private static final double PUSH_POWER = 0.85;
+    private static final double PUSH_POWER = 0.7;
 
     public ArtifactPusher(RobotHardware robot, Shooter shooter) {
         this.robot = robot;
@@ -33,6 +33,8 @@ public class ArtifactPusher {
             robot.wheelMotor.setPower(0);
         }
     }
+
+
 
     public void driverPushClose(boolean driverWantsToShoot) {
         if (driverWantsToShoot && shooter.isCloseShotReady()) {

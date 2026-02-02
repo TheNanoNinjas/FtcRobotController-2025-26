@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -23,7 +24,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
     private Shooter shooter;
     private ArtifactPusher artifactPusherArtifacts;
     private Intaker intake;
-
+    private AprilTagLimelight tagLimelight;
     private GoBildaPinpointDriver odo;
    // private Rev2mDistanceSensor distanceSensor;
 
@@ -34,7 +35,7 @@ public class AutoBlueFarTrial extends LinearOpMode {
         // Initialize hardware and mechanisms
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot, tagLimelight);
       //  artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 

@@ -1,65 +1,84 @@
-    package org.firstinspires.ftc.teamcode.mechanisms;
+package org.firstinspires.ftc.teamcode.mechanisms;
 
-    import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-    import org.firstinspires.ftc.teamcode.util.RobotHardware;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-    import com.qualcomm.hardware.limelightvision.LLResult;
-    import com.qualcomm.hardware.limelightvision.Limelight3A;
-    import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
-    import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-    import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-    import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-    import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-    @Autonomous(name = "Auto April Tags", group = "Competition")
-    public class AprilTagLimelight extends OpMode {
-       private Limelight3A Limelight3A;
+public class AprilTagLimelight {
 
-       private IMU imu;
+    private RobotHardware robot;
+    private Shooter shooter;
 
-        @Override
-        public void init() {
-            Limelight3A = hardwareMap.get(Limelight3A.class, "Limelight");
-    Limelight3A.pipelineSwitch(8);
-            imu = hardwareMap.get(IMU.class, "imu");
+    private Limelight3A limelight;
+    private IMU imu;
 
-            IMU.Parameters parameters = new IMU.Parameters(
-                    new RevHubOrientationOnRobot(
-                            RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                            RevHubOrientationOnRobot.UsbFacingDirection.UP 
-                    )
-            );
-            imu.initialize(parameters);
+    // Heights in meters
+    private final double cameraHeight = 13.0 / 39.37;
+    private final double tagHeight = 30.0 / 39.37;
 
-        }
+    public AprilTagLimelight(HardwareMap hardwareMap,
+                             RobotHardware robot,
+                             Shooter shooter) {
 
-        @Override
-        public void start(){
-    Limelight3A.start();
+        this.robot = robot;
+        this.shooter = shooter;
 
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+        limelight.pipelineSwitch(8);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                )
+        );
+        imu.initialize(parameters);
     }
-        @Override
-        public void loop() {
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            Limelight3A.updateRobotOrientation(orientation.getYaw());
-            LLResult llResult = Limelight3A.getLatestResult();
 
-            if(llResult != null && llResult.isValid()){
-                Pose3D botPose = llResult.getBotpose_MT2();
-                double distance = getDistanceFromTags(llResult.getTa());
-                telemetry.addData("Calculated Distance", distance);
-                telemetry.addData("Target x",llResult.getTx());
-                telemetry.addData("Target y", llResult.getTy());
-                telemetry.addData("Target area", llResult.getTa());
-                telemetry.addData("Yaw", botPose.getOrientation().getYaw());
-                telemetry.addData("Botpose", botPose.toString());
-            }
-        }
-        public double getDistanceFromTags(double ta){
-double scale = 30665.95;
-double distance = (scale/ta);
-return distance;
-        }
-
+    /** Call once after init */
+    public void start() {
+        limelight.start();
     }
+
+    /** Call every loop */
+    public void update() {
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        limelight.updateRobotOrientation(
+                orientation.getYaw(AngleUnit.DEGREES)
+        );
+    }
+
+    public boolean hasValidTarget() {
+        LLResult result = limelight.getLatestResult();
+        return result != null && result.isValid();
+    }
+
+    public double getDistanceMeters() {
+        LLResult result = limelight.getLatestResult();
+        if (result == null || !result.isValid()) return -1;
+
+        double ty = result.getTy();
+        if (Math.abs(ty) < 0.5) return -1;
+
+        double angleRad = Math.toRadians(ty);
+        return (tagHeight - cameraHeight) / Math.tan(angleRad);
+    }
+
+    public double getDistanceInches() {
+        double meters = getDistanceMeters();
+        return meters < 0 ? -1 : meters * 39.37;
+    }
+
+    public double getTx() {
+        LLResult result = limelight.getLatestResult();
+        return result != null ? result.getTx() : 0;
+    }
+}

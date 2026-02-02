@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -38,7 +39,7 @@ public class AutoRedStagedPradeep extends OpMode {
     private static final double INTAKE_MOVE_Y = 35;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
-
+    private AprilTagLimelight tagLimelight;
     private static int STAGE = 1;
     private final ElapsedTime stageTimer = new ElapsedTime();
     private final double remainingTurnAngle = 0;
@@ -48,7 +49,7 @@ public class AutoRedStagedPradeep extends OpMode {
     public void init() {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot, tagLimelight);
      //   artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
         

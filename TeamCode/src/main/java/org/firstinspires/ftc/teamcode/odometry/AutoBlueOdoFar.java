@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -23,7 +24,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
     private Shooter shooter;
     private ArtifactPusher pusher;
     private Intaker intake;
-
+    private AprilTagLimelight tagLimelight;
     // ===== TUNING CONSTANTS =====
     private static final double KP_POS = 0.004;
     private static final double KP_HEADING = 0.015;
@@ -36,7 +37,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot,tagLimelight);
         pusher = new ArtifactPusher(robot,shooter);
         intake = new Intaker(robot);
 
@@ -45,7 +46,7 @@ public class AutoBlueOdoFar extends LinearOpMode {
 
         waitForStart();
 
-        robot.resetOdo();
+
 
         if (opModeIsActive()) {
             runAuto();

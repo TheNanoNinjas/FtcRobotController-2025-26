@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -48,6 +49,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
 
+    private AprilTagLimelight tagLimelight;
     private static final double KP = 0.10;
     private static final double OBSTACLE_DISTANCE = 6.0;
     private static final double TURN_TOLERANCE_DEG = 2.0;
@@ -60,7 +62,7 @@ public class AutoRedAllianceStaged2 extends OpMode {
         robot.init(hardwareMap);
 
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot, tagLimelight);
        // artifactPusher = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 

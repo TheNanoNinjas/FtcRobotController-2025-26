@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
@@ -31,7 +32,7 @@ public class AutoRedStagedAvi extends OpMode {
     private Intaker intake;
     private GoBildaPinpointDriver odo;
     private Rev2mDistanceSensor distanceSensor;
-
+    private AprilTagLimelight tagLimelight;
     private static final double TARGET_Y_INCHES = 10.0;
     private static final double SECOND_TARGET_Y = 28;
     private static final double INTAKE_MOVE_Y = 43;
@@ -46,7 +47,7 @@ public class AutoRedStagedAvi extends OpMode {
     public void init() {
         robot.init(hardwareMap);
         drive = new MecanumDrive(robot);
-        shooter = new Shooter(robot);
+        shooter = new Shooter(robot, tagLimelight);
      //   artifactPusherArtifacts = new ArtifactPusher(robot);
         intake = new Intaker(robot);
 
