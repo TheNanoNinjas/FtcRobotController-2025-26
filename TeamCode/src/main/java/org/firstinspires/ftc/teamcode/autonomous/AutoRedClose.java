@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance Close", group = "Competition")
+@Autonomous(name = "Auto Red Alliance mClose", group = "Competition")
 public class AutoRedClose extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();

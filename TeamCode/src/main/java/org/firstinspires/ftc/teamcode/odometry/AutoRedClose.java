@@ -14,8 +14,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 
-@Autonomous(name = "Auto Red Alliance Timed Far", group = "Competition")
-public class AutoRedTimed extends LinearOpMode {
+@Autonomous(name = "Auto Red Alliance Close", group = "Competition")
+public class AutoRedClose extends LinearOpMode {
 
     private final RobotHardware robot = new RobotHardware();
     private MecanumDrive drive;
@@ -51,59 +51,47 @@ public class AutoRedTimed extends LinearOpMode {
     private void executeAutonomousSequence() throws InterruptedException {
         telemetry.addLine("Starting autonomous sequence");
         telemetry.update();
+        driveBackwardTimed(0.35, 800);
 
-        // Move forward to shooting position
-        driveForwardtimed(0.3,400);
-
-        // Turn to shooting angle
-        turnRight(0.3,225);
-
-        // Launch artifacts
         launchArtifacts();
 
+        turnLeft(0.3,800);
 
-        //turn back to 0, last value was 3
-        turnLeft(0.3,300);
-
-        // go forward
-        driveForwardtimed(0.3,1000);
-
-        //turn to intake earlier value was 100
-        turnLeft(0.3,1200);
-
-        sleep(500);
-
-        //start intaking
-        startIntake();
-
-        //go forward to intake, earlier value was 2600
-        driveBackwardTimed(0.35,3000);
+        strafeToX(256,0.3);
 
         startIntake();
-        //move backwards after intake, earlier time was 2350
-        driveForwardtimed(0.3, 2500);
+        driveBackwardTimed(0.3,1500);
+
+        driveForwardtimed(0.3,1500);
 
         stopIntake();
 
-        //turn back to 0, earlier value is 4
-        turnRight(0.3,1200);
+        strafeToX(0,0.3);
 
-        //move backwards to shooting zone
-        driveBackwardTimed(0.25, 1100);
-        sleep(1000);
+        turnRight(0.3,800);
 
-        driveForwardtimed(0.3,300);
+        launchArtifacts();
+//
+        turnLeft(0.35,700);
 
-        //  turn to shooting angle
-        turnRight(0.3,225);
+        strafeToX(500,0.3);
 
-        //launch artifacts
+        startIntake();
+        driveBackwardTimed(0.3,1500);
+
+        driveForwardtimed(0.3,1500);
+
+        stopIntake();
+
+        strafeToX(0,0.3);
+
+        turnRight(0.3,800);
+
         launchArtifacts();
 
-        // double startX = odo.getPosition().getX(DistanceUnit.MM);
-        //strafeToX(startX + 5.0, 0.3); // strafe right
+        turnLeft(0.3,400);
 
-        driveForwardtimed(0.3, 2000);
+        driveBackwardTimed(0.35,800);
 
         telemetry.addLine("Autonomous sequence complete");
         telemetry.update();
@@ -276,16 +264,16 @@ public class AutoRedTimed extends LinearOpMode {
     }
 
     private void launchArtifacts() throws InterruptedException {
-       //1st cycle
-        shooter.shootTagsFar();
-       if (shooter.isAtVelocity(1550-1650)){
-        pusher.startArtifactPushing();
-        intake.startPushing();
-       } else{
-           shooter.stopShooting();
-           pusher.stopPushing();
-           intake.stopPushing();
-       }
+        //1st cycle
+        shooter.shootTagsClose();
+        if (shooter.isAtVelocity(1250-1400)){
+            pusher.startArtifactPushing();
+            intake.startPushing();
+        } else{
+            shooter.stopShooting();
+            pusher.stopPushing();
+            intake.stopPushing();
+        }
     }
     private void startIntake() {
         intake.startPushing();

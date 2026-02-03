@@ -79,7 +79,9 @@ public class OpModeTest extends OpMode {
             shooter.shootTagsClose();
         } else if (wantsFarShot) {
             shooter.shootTagsFar();
-        } else if (gamepad2.square || gamepad1.left_bumper) {
+        }
+
+        else if (gamepad2.square || gamepad1.left_bumper) {
             shooter.manualIntakeShooter();
             shooterWasReady = false;
             return;

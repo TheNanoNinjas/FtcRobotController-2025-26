@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 
 
@@ -21,9 +23,17 @@ public class Shooter {
     private static final double AUTO_LONG_VELOCITY = 1600;
     private static final double AUTO_SHORT_VELOCITY = 1300;
 
-private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 70);
 
-private final double TagVelocityScaleFar = (SHORT_RANGE_VELOCITY / 92 );
+
+   // private double targetVelocity = 0;
+    //private static final double VELOCITY_STEP = 75;
+    //private static final double MAX_VELOCITY = 2500; // safety cap
+
+
+private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 68);
+
+private final double TagVelocityScaleFar = (SHORT_RANGE_VELOCITY / 96 );
+
 
 private double VelocityTag;
 private double VelocityTagFar;
@@ -49,7 +59,14 @@ private double VelocityTagFar;
         leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
+  /*  public void increaseVelocity() {
+        targetVelocity += VELOCITY_STEP;
+        targetVelocity = Math.min(targetVelocity, MAX_VELOCITY);
 
+        leftShooter.setVelocity(targetVelocity);
+        rightShooter.setVelocity(targetVelocity);
+    }
+*/
 
 
     public void startShootingFar() {
@@ -109,7 +126,7 @@ private double VelocityTagFar;
     public boolean isAtVelocity(double targetVelocity) {
         double leftError = Math.abs(leftShooter.getVelocity() - targetVelocity);
         double rightError = Math.abs(rightShooter.getVelocity() - targetVelocity);
-        return leftError < 150 && rightError < 150;
+        return leftError < 200 && rightError < 200;
     }
 
     public boolean isFarShotReady() {
