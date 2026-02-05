@@ -20,7 +20,7 @@ public class AprilTagLimelight {
     private IMU imu;
 
     // Heights in meters
-    private final double cameraHeight = 14 / 39.37;
+    private final double cameraHeight = 17 / 39.37;
     private final double tagHeight = 30.0 / 39.37;
 
     public AprilTagLimelight(HardwareMap hardwareMap,
@@ -41,6 +41,12 @@ public class AprilTagLimelight {
                 )
         );
         imu.initialize(parameters);
+    }
+
+    public AprilTagLimelight(AprilTagLimelight tagLimelight) {
+    }
+
+    public AprilTagLimelight(HardwareMap hardwareMap) {
     }
 
     /** Call once after init */

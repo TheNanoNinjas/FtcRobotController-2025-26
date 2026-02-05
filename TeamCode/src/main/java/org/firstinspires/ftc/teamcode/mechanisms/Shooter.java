@@ -30,9 +30,9 @@ public class Shooter {
     //private static final double MAX_VELOCITY = 2500; // safety cap
 
 
-private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 68);
+private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 75);
 
-private final double TagVelocityScaleFar = (SHORT_RANGE_VELOCITY / 96 );
+private final double TagVelocityScaleFar = (LONG_RANGE_VELOCITY / 121);
 
 
 private double VelocityTag;
