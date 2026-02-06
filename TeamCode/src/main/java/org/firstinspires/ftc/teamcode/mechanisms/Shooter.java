@@ -17,10 +17,10 @@ public class Shooter {
     private final DcMotorEx leftShooter;
     private final DcMotorEx rightShooter;
 //1570
-    private static final double LONG_RANGE_VELOCITY = 1580  ;
+    private static final double LONG_RANGE_VELOCITY = 1590  ;
     //1510
    private static final double SHORT_RANGE_VELOCITY = 1400;
-    private static final double AUTO_LONG_VELOCITY = 1600;
+    private static final double AUTO_LONG_VELOCITY = 1560;
     private static final double AUTO_SHORT_VELOCITY = 1300;
 
 
@@ -32,7 +32,7 @@ public class Shooter {
 
 private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 75);
 
-private final double TagVelocityScaleFar = (LONG_RANGE_VELOCITY / 121);
+private final double TagVelocityScaleFar = (LONG_RANGE_VELOCITY / 123);
 
 
 private double VelocityTag;
@@ -89,14 +89,15 @@ private double VelocityTagFar;
     }
 
     public void shootTagsFar() {
-        double distanceIn = tagLimelight.getDistanceInches();
-        if (distanceIn <= 0) return;
 
-        VelocityTagFar = TagVelocityScaleFar * distanceIn;
+        double distance = tagLimelight.getDistanceInches();
+        if (distance <= 0) return;
 
-        leftShooter.setVelocity(VelocityTagFar);
-        rightShooter.setVelocity(VelocityTagFar);
+        double velocity = TagVelocityScaleFar * distance;
+        leftShooter.setVelocity(velocity);
+        rightShooter.setVelocity(velocity);
     }
+
 
 
     public void startShootingAutoFar() {
@@ -126,7 +127,7 @@ private double VelocityTagFar;
     public boolean isAtVelocity(double targetVelocity) {
         double leftError = Math.abs(leftShooter.getVelocity() - targetVelocity);
         double rightError = Math.abs(rightShooter.getVelocity() - targetVelocity);
-        return leftError < 200 && rightError < 200;
+        return leftError < 75 && rightError < 75;
     }
 
     public boolean isFarShotReady() {

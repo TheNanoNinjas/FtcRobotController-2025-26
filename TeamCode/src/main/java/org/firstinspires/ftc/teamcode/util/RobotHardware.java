@@ -35,7 +35,7 @@ public class RobotHardware {
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
 
-    private Limelight3A limelight;
+
 
     //Sensors
     private GoBildaPinpointDriver odo;
@@ -70,8 +70,7 @@ public class RobotHardware {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
 
-        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
-        limelight.pipelineSwitch(8);
+
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(

@@ -31,7 +31,7 @@ public class OpModeTest extends OpMode {
 
         drive = new MecanumDrive(robot);
 
-        tagLimelight = new AprilTagLimelight(hardwareMap, robot, null);
+        tagLimelight = new AprilTagLimelight(hardwareMap);
 
         shooter = new Shooter(robot, tagLimelight);
 

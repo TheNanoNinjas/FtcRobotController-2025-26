@@ -7,7 +7,7 @@ public class ArtifactPusher {
     private final RobotHardware robot;
     private final Shooter shooter;
 //.8
-    private static final double PUSH_POWER = 0.7;
+    private static final double PUSH_POWER = 0.85;
 
     public ArtifactPusher(RobotHardware robot, Shooter shooter) {
         this.robot = robot;
@@ -15,7 +15,7 @@ public class ArtifactPusher {
     }
 
     public void startArtifactPushing() {
-        robot.wheelMotor.setPower(0.8);
+        robot.wheelMotor.setPower(0.76);
     }
 //.8
     public void reverseArtifacts() {

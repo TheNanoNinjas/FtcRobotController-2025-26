@@ -48,30 +48,32 @@ public class AutoRedTimed extends LinearOpMode {
 
         // ---------------- AUTON ----------------
         driveForwardTimed(0.3, 400);
-        turnRightTimed(0.3, 225);
+        turnRightTimed(0.3, 290);
 
-        launchArtifacts();
+        launchArtifacts(5000);
 
         turnLeftTimed(0.3, 300);
-        driveForwardTimed(0.3, 1000);
+        driveForwardTimed(0.3, 1650);
 
-        turnLeftTimed(0.3, 1200);
+        turnLeftTimed(0.3, 1400);
         sleep(500);
 
         intake.startPushing();
-        driveBackwardTimed(0.35, 3000);
+        driveBackwardTimed(0.35, 2500);
 
         driveForwardTimed(0.3, 2500);
-        intake.stopPushing();
+
 
         turnRightTimed(0.3, 1200);
+        intake.stopPushing();
+
         driveBackwardTimed(0.25, 1100);
 
         sleep(1000);
         driveForwardTimed(0.3, 300);
 
-        turnRightTimed(0.3, 225);
-        launchArtifacts();
+        turnRightTimed(0.3, 280);
+        launchArtifacts(5000);
 
         driveForwardTimed(0.3, 2000);
 
@@ -81,28 +83,33 @@ public class AutoRedTimed extends LinearOpMode {
 
     // ================= SHOOTING =================
 
-    private void launchArtifacts() {
+    private void launchArtifacts(long totalTimeMs) {
 
-        shooter.shootTagsFar();
+        shooter.startShootingAutoFar();
 
-        while (opModeIsActive()) {
-            double rpm = shooter.getLeftVelocity();
-
-            telemetry.addData("Shooter RPM", rpm);
-            telemetry.update();
-
-            if (rpm >= SHOOTER_MIN_RPM && rpm <= SHOOTER_MAX_RPM) {
-                pusher.startArtifactPushing();
-                intake.startPushing();
-                break;
-            }
+        while (opModeIsActive() && !shooter.isFarShotReady()) {
+            idle();
         }
 
-        sleep(900);
-        pusher.stopPushing();
-        intake.stopPushing();
+        long startTime = System.currentTimeMillis();
+
+        while (opModeIsActive() &&
+                System.currentTimeMillis() - startTime < totalTimeMs) {
+
+            pusher.startArtifactPushing();
+            intake.startPushing();
+            sleep(150);   // feed time
+
+            pusher.stopPushing();
+            intake.stopPushing();
+            sleep(1500);
+        }
+
         shooter.stopShooting();
     }
+
+
+
 
     // ================= DRIVE HELPERS =================
 
