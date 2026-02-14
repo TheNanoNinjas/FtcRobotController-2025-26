@@ -30,7 +30,6 @@ public class AutoRedClose extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // ---------------- INIT ----------------
         robot = new RobotHardware();
         robot.init(hardwareMap);
 
@@ -46,24 +45,40 @@ public class AutoRedClose extends LinearOpMode {
         waitForStart();
 
         if (!opModeIsActive()) return;
-driveBackwardTimed(0.3,1750);
-launchArtifacts(5000);
+driveBackwardTimed(0.35,1340);
+launchArtifacts(4500);
 
-turnLeftTimed(0.3,1500);
+turnLeftTimed(0.3,600);
 
-strafeToX(350,0.3);
+driveBackwardTimed(0.35, 50);
 
-intake.startPushing();
-driveBackwardTimed(0.3,2000);
+turnLeftTimed(0.3,880);
 
-driveForwardTimed(0.3,2000);
+        intake.startPushing();
+        shooter.manualIntakeShooter();
+        pusher.startArtifactPushing();
 
-strafeToX(350,0.3);
+driveBackwardTimed(0.35,1850);
 
-        turnRightTimed(0.3,1500);
+driveForwardTimed(0.35,1600);
 
-        launchArtifacts(5000);
+        intake.stopPushing();
+        shooter.stopShooting();
+        pusher.stopPushing();
 
+turnRightTimed(0.3,900);
+
+driveForwardTimed(0.35,50);
+
+turnRightTimed(0.3,500);
+
+driveBackwardTimed(0.3,100);
+
+        launchArtifacts(4500);
+
+        turnLeftTimed(0.3,1000);
+
+        driveBackwardTimed(0.35,1500);
         stopAll();
     }
 
@@ -140,13 +155,13 @@ strafeToX(350,0.3);
         while (opModeIsActive() &&
                 System.currentTimeMillis() - startTime < totalTimeMs) {
 
-            pusher.startArtifactPushing();
+            pusher.startAutoPush();
             intake.startPushing();
-            sleep(150);   // feed time
+            sleep(170);   // feed time
 
             pusher.stopPushing();
             intake.stopPushing();
-            sleep(1500);
+            sleep(1300);
         }
 
         shooter.stopShooting();
@@ -155,7 +170,7 @@ strafeToX(350,0.3);
 
 
 
-    // ================= DRIVE HELPERS =================
+
 
     private void driveForwardTimed(double power, long timeMs) {
         setDrivePower(power, power, power, power);

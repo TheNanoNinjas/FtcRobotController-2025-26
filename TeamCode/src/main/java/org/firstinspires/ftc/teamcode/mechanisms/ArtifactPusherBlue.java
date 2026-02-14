@@ -2,26 +2,22 @@ package org.firstinspires.ftc.teamcode.mechanisms;
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-public class ArtifactPusher {
+public class ArtifactPusherBlue {
 
     private final RobotHardware robot;
-    private final Shooter shooter;
-//.8
+    private final ShooterBlue shooterBlue;
+    //.8
     private static final double PUSH_POWER = 0.85;
 
-    public ArtifactPusher(RobotHardware robot, Shooter shooter) {
+    public ArtifactPusherBlue(RobotHardware robot, ShooterBlue shooterBlue) {
         this.robot = robot;
-        this.shooter = shooter;
+        this.shooterBlue = shooterBlue;
     }
 
     public void startArtifactPushing() {
         robot.wheelMotor.setPower(0.76);
     }
-
-    public void startAutoPush(){
-        robot.wheelMotor.setPower(0.95);
-    }
-//.8
+    //.8
     public void reverseArtifacts() {
         robot.wheelMotor.setPower(-0.9);
     }
@@ -31,7 +27,7 @@ public class ArtifactPusher {
     }
 
     public void driverPushFar(boolean driverWantsToShoot) {
-        if (driverWantsToShoot && shooter.isFarShotReady()) {
+        if (driverWantsToShoot && shooterBlue.isFarShotReady()) {
             robot.wheelMotor.setPower(PUSH_POWER);
         } else {
             robot.wheelMotor.setPower(0);
@@ -41,7 +37,7 @@ public class ArtifactPusher {
 
 
     public void driverPushClose(boolean driverWantsToShoot) {
-        if (driverWantsToShoot && shooter.isCloseShotReady()) {
+        if (driverWantsToShoot && shooterBlue.isCloseShotReady()) {
             robot.wheelMotor.setPower(PUSH_POWER);
         } else {
             robot.wheelMotor.setPower(0);

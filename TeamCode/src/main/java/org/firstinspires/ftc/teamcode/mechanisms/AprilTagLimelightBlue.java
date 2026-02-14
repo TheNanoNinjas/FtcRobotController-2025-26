@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class AprilTagLimelight {
+public class AprilTagLimelightBlue {
 
     private final Limelight3A limelight;
     private final IMU imu;
@@ -16,10 +16,10 @@ public class AprilTagLimelight {
     private final double cameraHeight = 17 / 39.37;
     private final double tagHeight = 30.0 / 39.37;
 
-    public AprilTagLimelight(HardwareMap hardwareMap) {
+    public AprilTagLimelightBlue(HardwareMap hardwareMap) {
 
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
-        limelight.pipelineSwitch(8);
+        limelight.pipelineSwitch(6);
 
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(

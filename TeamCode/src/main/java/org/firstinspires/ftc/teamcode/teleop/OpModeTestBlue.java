@@ -3,25 +3,25 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelightBlue;
 import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusher;
+import org.firstinspires.ftc.teamcode.mechanisms.ArtifactPusherBlue;
 import org.firstinspires.ftc.teamcode.mechanisms.Intaker;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
-import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
-import org.firstinspires.ftc.teamcode.util.RobotHardware;
-import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
 
-@TeleOp(name = "OpMode Test")
-public class OpModeTest extends OpMode {
+import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.mechanisms.ShooterBlue;
+import org.firstinspires.ftc.teamcode.util.RobotHardware;
+
+@TeleOp(name = "OpMode Test Blue")
+public class OpModeTestBlue extends OpMode {
 
     RobotHardware robot = new RobotHardware();
     MecanumDrive drive;
-    Shooter shooter;
+    ShooterBlue shooterBlue;
     Intaker intake;
-    ArtifactPusher artifactPusher;
-    AprilTagLimelight tagLimelight;
+    ArtifactPusherBlue artifactPusher;
+    AprilTagLimelightBlue tagLimelightBlue;
 
     boolean shooterWasReady = false;
 
@@ -31,14 +31,14 @@ public class OpModeTest extends OpMode {
 
         drive = new MecanumDrive(robot);
 
-        tagLimelight = new AprilTagLimelight(hardwareMap);
+        tagLimelightBlue = new AprilTagLimelightBlue(hardwareMap);
 
-        shooter = new Shooter(robot, tagLimelight);
+        shooterBlue = new ShooterBlue(robot, tagLimelightBlue);
 
         intake = new Intaker(robot);
-        artifactPusher = new ArtifactPusher(robot, shooter);
+        artifactPusher = new ArtifactPusherBlue(robot, shooterBlue);
 
-        tagLimelight.start();
+        tagLimelightBlue.start();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class OpModeTest extends OpMode {
         handleDriving();
         handleShooting();
         handleFeeding();
-        tagLimelight.update();
+        tagLimelightBlue.update();
         updateTelemetry();
     }
 
@@ -76,25 +76,28 @@ public class OpModeTest extends OpMode {
         boolean wantsFarShot = gamepad2.left_bumper;
 
         if (wantsCloseShot) {
-            shooter.shootTagsClose();
+            shooterBlue.shootTagsClose();
         } else if (wantsFarShot) {
-            shooter.shootTagsFar();
-        }else if (gamepad2.circle){
-            shooter.startFlywheel();
+            shooterBlue.shootTagsFar();
+        }else if(gamepad2.triangle){
+            shooterBlue.startShootingFar();
+        }
+        else if (gamepad2.circle){
+            shooterBlue.startShootingClose();
         }
         else if (gamepad2.square || gamepad1.left_bumper) {
-            shooter.manualIntakeShooter();
+            shooterBlue.manualIntakeShooter();
             shooterWasReady = false;
             return;
         } else {
-            shooter.stopShooting();
+            shooterBlue.stopShooting();
             shooterWasReady = false;
             return;
         }
 
         boolean shooterReady =
-                (wantsCloseShot && shooter.isCloseShotReady()) ||
-                        (wantsFarShot && shooter.isFarShotReady());
+                (wantsCloseShot && shooterBlue.isCloseShotReady()) ||
+                        (wantsFarShot && shooterBlue.isFarShotReady());
 
         if (shooterReady && !shooterWasReady) {
             gamepad2.rumble(300);
@@ -138,9 +141,9 @@ public class OpModeTest extends OpMode {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("Left Shooter Vel", shooter.getLeftVelocity());
-        telemetry.addData("Right Shooter Vel", shooter.getRightVelocity());
-        telemetry.addData("Distance Inches", tagLimelight.getDistanceInches());
+        telemetry.addData("Left Shooter Vel", shooterBlue.getLeftVelocity());
+        telemetry.addData("Right Shooter Vel", shooterBlue.getRightVelocity());
+        telemetry.addData("Distance Inches", tagLimelightBlue.getDistanceInches());
         telemetry.update();
     }
 

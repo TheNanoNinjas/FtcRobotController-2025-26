@@ -5,45 +5,44 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelight;
-
+import org.firstinspires.ftc.teamcode.mechanisms.AprilTagLimelightBlue;
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-public class Shooter {
+public class ShooterBlue {
 
     private RobotHardware robot;
-    private final AprilTagLimelight tagLimelight;
+    private final AprilTagLimelightBlue tagLimelightBlue;
 
     private final DcMotorEx leftShooter;
-
     private final DcMotorEx rightShooter;
-
-
     //1570
     private static final double LONG_RANGE_VELOCITY = 1590  ;
     //1510
-   private static final double SHORT_RANGE_VELOCITY = 1400;
-    private static final double AUTO_LONG_VELOCITY = 1562;
-    private static final double AUTO_SHORT_VELOCITY = 1416;
+    private static final double SHORT_RANGE_VELOCITY = 1400;
+    private static final double AUTO_LONG_VELOCITY = 1565;
+    private static final double AUTO_SHORT_VELOCITY = 1300;
 
 
-   // private double targetVelocity = 0;
+
+    // private double targetVelocity = 0;
     //private static final double VELOCITY_STEP = 75;
     //private static final double MAX_VELOCITY = 2500; // safety cap
 
 
-private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 73);
+    private final double TagVelocityScaleShort = (SHORT_RANGE_VELOCITY / 65);
+//go up it decreases
+//go down it increases
+    private final double TagVelocityScaleFar = (LONG_RANGE_VELOCITY / 116);
 
-private final double TagVelocityScaleFar = (LONG_RANGE_VELOCITY / 125);
 
-
-private double VelocityTag;
-private double VelocityTagFar;
+    private double VelocityTag;
+    private double VelocityTagFar;
 
     private static final double MANUAL_INTAKE_POWER = -0.5;
 
-    public Shooter(RobotHardware robot, AprilTagLimelight tagLimelight) {
-        this.tagLimelight = tagLimelight;
+    public ShooterBlue(RobotHardware robot, AprilTagLimelightBlue tagLimelightBlue) {
+        this.tagLimelightBlue = tagLimelightBlue;
 
 
         leftShooter = robot.leftShooter;
@@ -70,10 +69,7 @@ private double VelocityTagFar;
     }
 */
 
-public void startFlywheel(){
-    leftShooter.setVelocity(1800);
 
-}
     public void startShootingFar() {
         leftShooter.setVelocity(LONG_RANGE_VELOCITY);
         rightShooter.setVelocity(LONG_RANGE_VELOCITY);
@@ -84,7 +80,7 @@ public void startFlywheel(){
         rightShooter.setVelocity(SHORT_RANGE_VELOCITY);
     }
     public void shootTagsClose() {
-        double distanceIn = tagLimelight.getDistanceInches();
+        double distanceIn = tagLimelightBlue.getDistanceInches();
         if (distanceIn <= 0) return;
 
         VelocityTag = TagVelocityScaleShort * distanceIn;
@@ -95,7 +91,7 @@ public void startFlywheel(){
 
     public void shootTagsFar() {
 
-        double distance = tagLimelight.getDistanceInches();
+        double distance = tagLimelightBlue.getDistanceInches();
         if (distance <= 0) return;
 
         double velocity = TagVelocityScaleFar * distance;

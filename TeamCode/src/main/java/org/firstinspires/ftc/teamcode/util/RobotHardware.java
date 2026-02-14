@@ -61,11 +61,12 @@ public class RobotHardware {
         // Set shooter direction
         rightShooter.setDirection(DcMotor.Direction.REVERSE);
         wheelMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftShooter.setDirection(DcMotor.Direction.REVERSE);
 
         // IMU
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
@@ -76,7 +77,7 @@ public class RobotHardware {
         IMU.Parameters parameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
                 )
         );
         imu.initialize(parameters);

@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+/*package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.mechanisms.AprilTags;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Autonomous
 public class AprilTagAuto extends OpMode {
@@ -22,3 +21,4 @@ public class AprilTagAuto extends OpMode {
         telemetry.addData("id20 String", id20.toString());
     }
 }
+*/

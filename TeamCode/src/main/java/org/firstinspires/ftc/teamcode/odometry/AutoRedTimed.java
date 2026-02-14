@@ -29,7 +29,7 @@ public class AutoRedTimed extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // ---------------- INIT ----------------
+
         robot = new RobotHardware();
         robot.init(hardwareMap);
 
@@ -46,42 +46,45 @@ public class AutoRedTimed extends LinearOpMode {
 
         if (!opModeIsActive()) return;
 
-        // ---------------- AUTON ----------------
-        driveForwardTimed(0.3, 400);
-        turnRightTimed(0.3, 290);
+
+        driveForwardTimed(0.3, 300);
+        turnRightTimed(0.3, 168);
 
         launchArtifacts(5000);
 
-        turnLeftTimed(0.3, 300);
-        driveForwardTimed(0.3, 1650);
+        turnLeftTimed(0.3, 210);
+        driveForwardTimed(0.3, 650);
 
-        turnLeftTimed(0.3, 1400);
+        turnLeftTimed(0.3, 900);
         sleep(500);
 
         intake.startPushing();
-        driveBackwardTimed(0.35, 2500);
+        shooter.manualIntakeShooter();
+        pusher.startArtifactPushing();
 
-        driveForwardTimed(0.3, 2500);
+        driveBackwardTimed(0.35, 2000);
+
+        driveForwardTimed(0.3, 1750);
 
 
-        turnRightTimed(0.3, 1200);
+        turnRightTimed(0.3, 900);
         intake.stopPushing();
-
-        driveBackwardTimed(0.25, 1100);
+        shooter.stopShooting();
+        pusher.stopPushing();
+        driveBackwardTimed(0.25, 1000);
 
         sleep(1000);
-        driveForwardTimed(0.3, 300);
+        driveForwardTimed(0.3, 150);
 
-        turnRightTimed(0.3, 280);
+        turnRightTimed(0.3, 160);
         launchArtifacts(5000);
 
-        driveForwardTimed(0.3, 2000);
+        driveForwardTimed(0.4, 1000);
 
-        // ---------------- END ----------------
+
         stopAll();
     }
 
-    // ================= SHOOTING =================
 
     private void launchArtifacts(long totalTimeMs) {
 
@@ -98,20 +101,16 @@ public class AutoRedTimed extends LinearOpMode {
 
             pusher.startArtifactPushing();
             intake.startPushing();
-            sleep(150);   // feed time
+            sleep(100);   // feed time
 
             pusher.stopPushing();
             intake.stopPushing();
-            sleep(1500);
+            sleep(1300);
         }
 
         shooter.stopShooting();
     }
 
-
-
-
-    // ================= DRIVE HELPERS =================
 
     private void driveForwardTimed(double power, long timeMs) {
         setDrivePower(power, power, power, power);
