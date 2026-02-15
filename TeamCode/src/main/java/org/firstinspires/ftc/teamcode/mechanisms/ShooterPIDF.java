@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @TeleOp
 public class ShooterPIDF extends OpMode {
 
-    public DcMotorEx leftShooter;
-    public DcMotorEx rightShooter;
-
-   public double highVelocity = 2000;
+    public DcMotorEx flywheel;
+public DcMotorEx leftShooter;
+public DcMotorEx rightShooter;
+   public double highVelocity = 2500;
 
    public double lowVelocity = 1350;
 

@@ -35,6 +35,7 @@ public class RobotHardware {
     public DcMotor intakeMotor;
     public DcMotor wheelMotor;
 
+    public DcMotor flywheelMotor;
 
 
     //Sensors
@@ -48,6 +49,8 @@ public class RobotHardware {
         fr_motor = hardwareMap.get(DcMotor.class, "fr_motor");
         bl_motor = hardwareMap.get(DcMotor.class, "bl_motor");
         br_motor = hardwareMap.get(DcMotor.class, "br_motor");
+
+        flywheelMotor = hardwareMap.get(DcMotor.class, "flywheelMotor");
 
         // Set drive motor directions (left motors reversed)
         fl_motor.setDirection(DcMotor.Direction.REVERSE);
@@ -144,6 +147,7 @@ public class RobotHardware {
         telemetry.addData("BR Motor", br_motor != null ? "OK" : "FAIL");
         telemetry.addData("Left Shooter", leftShooter != null ? "OK" : "FAIL");
         telemetry.addData("Right Shooter", rightShooter != null ? "OK" : "FAIL");
+        telemetry.addData("Flywheel Shooter", flywheelMotor != null ? "OK" : "FAIL");
         telemetry.addData("Intake Motor", intakeMotor != null ? "OK" : "FAIL");
         telemetry.addData("Wheel Motor", wheelMotor != null ? "OK" : "FAIL");
         telemetry.addData("Odometry Wheels", odo != null ? "OK" : "FAIL");
@@ -157,6 +161,7 @@ public class RobotHardware {
         if (fr_motor != null) telemetry.addData("FR Motor", "Port " + fr_motor.getPortNumber());
         if (bl_motor != null) telemetry.addData("BL Motor", "Port " + bl_motor.getPortNumber());
         if (br_motor != null) telemetry.addData("BR Motor", "Port " + br_motor.getPortNumber());
+        if (flywheelMotor != null) telemetry.addData("Flywheel Shooter", "Port " + flywheelMotor.getPortNumber());
         if (leftShooter != null) telemetry.addData("Left Shooter", "Port " + leftShooter.getPortNumber());
         if (rightShooter != null) telemetry.addData("Right Shooter", "Port " + rightShooter.getPortNumber());
         if (intakeMotor != null) telemetry.addData("Intake Motor", "Port " + intakeMotor.getPortNumber());
